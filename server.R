@@ -13,7 +13,7 @@
   #function to call instance of data
   data_now <- callModule(tsvFile, "datafile", stringsAsFactors = FALSE)
   # #Change max upload size of data file
-  # options(shiny.maxRequestSize=10*1024^2)
+  options(shiny.maxRequestSize=10*1024^2)
 
   # disNme <- callModule(disNme, "diseaseName", stringAsFactors = FALSE)
   output$disNme <- renderUI({
@@ -43,7 +43,7 @@
   #        verbatimTextOutput('out4'),
   #        selectInput('in4', 'Options', c(Choose='', state.name), selectize=TRUE)
   # ))
-
+  
   output$dateRange <- renderUI({
     tmp_df <- as.data.frame(data_now())
     dateMin <- range(as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y"))[1]
@@ -78,7 +78,7 @@
   
   sliderValues <- reactive({
     data.frame(
-      Name = c("Disease", "Report Group", "bin", "dtRange"),
+      Name = c("Disease", "Report Group", "bin", "dtRange", "sex", "ethnicity", "race"),
       Value = as.character(c(input$disNme
                              , input$rptGroup
                              , input$binRange
@@ -87,24 +87,99 @@
     )
 # test <- (3.49*sd(tmp_df$DtEpisode))/(as.numeric(dateMax-dateMin)^(1/3))
     })
+  
+  output$Sex <- renderUI({
+    tmp_df <- as.data.frame(data_now())
+    getSex <- unique(unlist(tmp_df$Sex))
+    selectInput(inputId = "Sex"
+                   , label = h5("Select Sex:")
+                   , choices = getSex
+                   , selected = getSex
+                   , multiple = TRUE
+                )
+  })
+  
+  output$ethnicity <- renderUI({
+    tmp_df <- as.data.frame(data_now())
+    getEthnic <- unique(unlist(tmp_df$Ethnicity))
+    checkboxGroupInput(inputId = "Ethnicity"
+                       , label = h5("Select Ethnicity:"), inline = TRUE
+                       , choiceNames = getEthnic
+                       , choiceValues = getEthnic
+                       , selected = getEthnic
+    )
+  })
+
+  output$race <- renderUI({
+    tmp_df <- as.data.frame(data_now())
+    getRace <- unique(unlist(tmp_df$Race))
+    selectInput(inputId = "Race", label = h5("Select Race:")
+                   # , inline = TRUE
+                , choices = getRace
+                , selected = getRace
+                , multiple = TRUE
+                , selectize = TRUE, width = '95%'
+                
+    )
+  })
+  
+  # RV <- reactiveValues(b_ui_flg=FALSE)
+  # 
+  # output$A_panel <- renderUI({
+  #   if(input$sidebarmenu != "a") return()
+  #   cat('Inside A Panel \n')
+  #   sliderInput("b", "Under A", 1, 100, 50)
+  # })
+  # 
+  # observeEvent(input$sidebarmenu, {
+  #   if(input$sidebarmenu != "b") return()
+  #   if (RV$b_ui_flg) return() 
+  #   RV$b_ui_flg <- TRUE
+  #   cat('Inside B Panel \n')
+  #   output$B_panel <- renderUI({
+  #     sliderInput("b", "Under B", 1, 100, 50)
+  #   })
+  # })
+  
+#Data Tables
+  
+  output$ageGrp <- renderUI({
+    tmp_df <- as.data.frame(data_now())
+    getAgeGrp <- unique(unlist(tmp_df$ageGrp))
+    checkboxGroupInput(inputId = "ageGrp", label = h5("Age Group")
+                       , choiceNames = getAgeGrp
+                       , choiceValues = getAgeGrp
+                       , inline = TRUE)
+  })
+  
   output$values <- renderTable({
     sliderValues()
   })
   # output$table <- renderDataTable({
   #   datafile()
   # })
+  
+#Data Visualizations
   output$distPlot <- renderPlot({
     # dateMin <- strftime(input$dateRange[1], format = "%Y-%m-%d")
     # dateMax <- strftime(input$dateRange[2], format = "%Y-%m-%d")
-    dateMin <- input$dateRange[1]
-    dateMax <- input$dateRange[2]
-    disNme <- c(input$disease)
-    rptGroup <- c(input$rstat)
+    # dateMin <- input$dateRange[1]
+    # dateMax <- input$dateRange[2]
+    # disNme <- c(input$disease)
+    # rptGroup <- c(input$rstat)
+    # race <- c(input$Race)
+    # ethnicity <- c(input$Ethnicity)
+    # sex <- c(input$Sex)
+    # ageGrp <- c(input$ageGrp)
     tmp_df <- data_now()
     tmp_df$DtEpisode <- as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y")
-    tmp_df <- tmp_df[(tmp_df$DtEpisode>=dateMin & tmp_df$DtEpisode<=dateMax)
-                     & tmp_df$DisShort %in% disNme
-                     & tmp_df$RStatus %in% rptGroup
+    tmp_df <- tmp_df[(tmp_df$DtEpisode>=input$dateRange[1] & tmp_df$DtEpisode<=input$dateRange[2])
+                     & tmp_df$DisShort %in% c(input$disease)
+                     & tmp_df$RStatus %in% c(input$rstat)
+                     & tmp_df$Sex %in% c(input$Sex)
+                     & tmp_df$Race %in% c(input$Race)
+                     & tmp_df$Ethnicity %in% c(input$Ethnicity)
+                     # & tmp_df$Quintile %in% ageGrp
                      ,]
     # tmp_df <- tmp_df %>% filter(tmp_df$DisShort %in% input$disNme) %>% filter(tmp_df$RStatus %in% rptGroup)
    p <- ggplot(data = tmp_df, aes_string(x=tmp_df$DtEpisode
@@ -145,8 +220,12 @@
     tmp_df <- data_now()
     tmp_df$DtEpisode <- as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y")
     tmp_df <- tmp_df[(tmp_df$DtEpisode>=input$dateRange[1] & tmp_df$DtEpisode<=input$dateRange[2])
-                     & tmp_df$DisShort %in% input$disease
-                     & tmp_df$RStatus %in% input$rstat
+                     & tmp_df$DisShort %in% c(input$disease)
+                     & tmp_df$RStatus %in% c(input$rstat)
+                     & tmp_df$Sex %in% c(input$Sex)
+                     & tmp_df$Race %in% c(input$Race)
+                     & tmp_df$Ethnicity %in% c(input$Ethnicity)
+                     # & tmp_df$Quintile %in% ageGrp
                      ,]
     # if(4 %in% input$mapGroup){
     cnty_freq_df <- as.data.frame(table(tmp_df$LHJ, factor(tmp_df$RStatus)))
@@ -222,19 +301,14 @@
     tmp_df <- data_now()
     tmp_df$DtEpisode <- as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y")
     tmp_df <- tmp_df[(tmp_df$DtEpisode>=input$dateRange[1] & tmp_df$DtEpisode<=input$dateRange[2])
-                     & tmp_df$DisShort %in% input$disease
-                     & tmp_df$RStatus %in% input$rstat
+                     & tmp_df$DisShort %in% c(input$disease)
+                     & tmp_df$RStatus %in% c(input$rstat)
+                     & tmp_df$Sex %in% c(input$Sex)
+                     & tmp_df$Race %in% c(input$Race)
+                     & tmp_df$Ethnicity %in% c(input$Ethnicity)
+                     # & tmp_df$Quintile %in% ageGrp
                      ,]
-    # dateMin <- input$dateRange[1]
-    # dateMax <- input$dateRange[2]
-    # disNme <- c(input$disease)
-    # rptGroup <- c(input$rstat)
-    # tmp_df <- data_now()
-    # tmp_df$DtEpisode <- as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y")
-    # tmp_df <- tmp_df[(tmp_df$DtEpisode>=dateMin & tmp_df$DtEpisode<=dateMax)
-    #                  & tmp_df$DisShort %in% disNme
-    #                  & tmp_df$RStatus %in% rptGroup
-    #                  ,]
+    
     cnty_freq_df <- as.data.frame(table(tmp_df$LHJ, factor(tmp_df$RStatus)))
     
     cnty_freq_df <- as.data.table(cnty_freq_df) #From countyPlot
@@ -274,7 +348,7 @@
     # df.polygon <- df.polygon[!is.na(df.polygon@data$geography),]
     df.polygon <- df.polygon[order(df.polygon@data$incidence_rt),]
     # renderPlot({
-    p <- CRmap00(mapBorder=input$mapBorder, mapLayer=input$mapLayer)
+    p <- CRmap00(mapBorder=input$mapBorder, mapLayer=input$mapLayer, tmp_df=tmp_df)
     p
     # **This is where I will add custom function for plotting**
   })
@@ -282,23 +356,21 @@
   output$CRstMapPlot <- renderPlot({
       min_Date <- as.Date(as.character(input$date_range[1]), format = '%Y-%m-%d')
       max_Date <- as.Date(as.character(input$date_range[2]), format = '%Y-%m-%d')
-      # # tmp_df[(tmp_df$Latitude==""),]<-NA
-      # # tmp_df[(tmp_df$Longitude==""),]<-NA
-      # tmp_df[is.null(tmp_df$Longitude),]<- NA
-      # tmp_df<- tmp_df[!is.na(tmp_df$Longitude)|!is.na(tmp_df$Latitude),]
-      # tmp_df$Longitude <- as.numeric(as.character(tmp_df$Longitude))
-      # tmp_df$Latitude <- as.numeric(as.character(tmp_df$Latitude))
-      # tmp_df$DtEpisode <- as.Date(as.character(tmp_df$DtEpisode), format = '%m/%d/%y')
       tmp_df <- data_now()
+      tmp_df$DtEpisode <- as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y")
       tmp_df <- tmp_df[(tmp_df$DtEpisode>=min_Date & tmp_df$DtEpisode<=max_Date)
-                       & tmp_df$DisShort == input$disNme
-                       & tmp_df$RStatus == input$rstat,]
+                       & tmp_df$DisShort %in% c(input$disease)
+                       & tmp_df$RStatus %in% c(input$rstat)
+                       & tmp_df$Sex %in% c(input$Sex)
+                       & tmp_df$Race %in% c(input$Race)
+                       & tmp_df$Ethnicity %in% c(input$Ethnicity)
+                       # & tmp_df$Quintile %in% ageGrp
+                       ,]
       
       counties <- map_data("county")
-      
       california <- subset(counties, region == "california")
       #or_county <- subset(counties, region == "oregon")
-      ca_county <- subset(counties, region == "california")
+      # ca_county <- subset(counties, region == "california")
       # For county heat mapping 
       #      as.data.frame.matrix(as.data.table(table(tmp_df$City)))
       # test <- as.data.frame.matrix(as.data.table(table(tmp_df$CntyGEO)))
@@ -308,25 +380,28 @@
       #              , by.x = "V1"
       #              , by.y="subregion"
       #              , all= TRUE)
-
+      hist_df <- cbind(as.data.table(table(tmp_df$LHJ))
+                       , as.data.table(as.data.frame.matrix(table(tmp_df$LHJ, factor(tmp_df$RStatus)))))
+      hist_df[hist_df$V1=="Berkeley",]$V1 <- "Alameda"
+      hist_df[hist_df$V1=="Long Beach",]$V1 <- "Los Angeles"
+      hist_df <- setDT(hist_df)[, .(Freq=sum(Confirmed)), by = .(V1)]
+      hist_df <- 
+        
+        census_info <- merge(cnty_freq_df, census_info, by.x = "Var1", by.y = "GEO.display.label")
+      # census_info <- left_join(cnty_freq_df, census_info, by = c("Var1"="GEO.display.label"))
+      
+      #Measures
+      census_info$incidence_rt <- (as.numeric(census_info$Freq)*100000)/as.numeric(census_info$respop72017)
+      census_info$st_err <- as.numeric(census_info$incidence_rt)/(as.numeric(census_info$respop72017)^.5)
+      census_info$rel_sterr <- (census_info$st_err*100)/census_info$incidence_rt
+      
+      ##Need to work on developing heat map for multiple RStatus conditons##
+      
+      census_info <- census_info %>% rename(id = GEO.id2, geography = Var1, total = respop72017, cases = Freq)
     # join tabular data (ggtract from updateCR) for ggplot preparations
     ggtract<-left_join(ggtract, test3, by=c("id"))
-    #
-    #     library(maptools)
-    #     ggtract<-fortify(tract, region = "GEOID")
-    #     # join tabular data
-    #     ggtract<-left_join(ggtract, data, by=c("id"))
-    #
-    #     # here we limit to the NYC counties
-    #     ggtract <- ggtract[grep("Kings|Bronx|New York County|Queens|Richmond", ggtract$geography),]
-    #
-    #     ggplot() +
-    #       geom_polygon(data = ggtract , aes(x=long, y=lat, group = group, fill=percent), color="grey50") +
-    #       scale_fill_gradientn(colours = c("red", "white", "cadetblue"),
-    #                            values = c(1,0.5, .3, .2, .1, 0))+
-    #       coord_map(xlim = c(-74.26, -73.71), ylim = c(40.49,40.92))
 
-    p <- CRmap01()
+    p <- CRmap01(mapBorder=input$mapBorder, mapLayer=input$mapLayer, tmp_df=tmp_df)
     p
     }
   )
@@ -384,90 +459,60 @@
   # #          if(min(dist) < 3)
   # #              tmp_df$wt[which.min(dist)]
   # #    }
-  # 
-  # output$mapPlot <- renderPlot({
-  #   minDate <- as.Date(as.character(input$date_range[1]), format = '%Y-%m-%d')
-  #   maxDate <- as.Date(as.character(input$date_range[2]), format = '%Y-%m-%d')
-  #   # # tmp_df[(tmp_df$Latitude==""),]<-NA
-  #   # # tmp_df[(tmp_df$Longitude==""),]<-NA
-  #   # tmp_df[is.null(tmp_df$Longitude),]<- NA
-  #   # tmp_df<- tmp_df[!is.na(tmp_df$Longitude)|!is.na(tmp_df$Latitude),]
-  #   # tmp_df$Longitude <- as.numeric(as.character(tmp_df$Longitude))
-  #   # tmp_df$Latitude <- as.numeric(as.character(tmp_df$Latitude))
-  #   # tmp_df$DtEpisode <- as.Date(as.character(tmp_df$DtEpisode), format = '%m/%d/%y')
-  #   tmp_df <- data_now()
-  #   tmp_df <- tmp_df[(tmp_df$DtEpisode>=min_Date & tmp_df$DtEpisode<=max_Date)
-  #                    & tmp_df$DisShort == input$disNme
-  #                    & tmp_df$RStatus == input$rstat,]
-  #   
-  #   counties <- map_data("county")
-  #   california <- subset(counties, region == "california")
-  #   #or_county <- subset(counties, region == "oregon")
-  #   ca_county <- subset(counties, region == "california")
-  #   # For county heat mapping 
-  #   #      as.data.frame.matrix(as.data.table(table(tmp_df$City)))
-  #   # test <- as.data.frame.matrix(as.data.table(table(tmp_df$CntyGEO)))
-  #   # test$V1 <- tolower(test$V1)
-  #   # meh <- merge(x = test
-  #   #              , y = as.data.frame((california[california$region %in% "california",]))
-  #   #              , by.x = "V1"
-  #   #              , by.y="subregion"
-  #   #              , all= TRUE)
-  #   
-  #   p <- ggplot() + geom_polygon(data = california, aes(x=long, y=lat, group = group)) + 
-  #     geom_polygon(color = "white", fill = "gray") +
-  #     # + coord_fixed(1.3) +
-  #     xlim(-130, -107) + ylim(31.5,43) +
-  #     labs(title = input$mapTitle
-  #          , x = "Longitude"
-  #          , y = "Latitude")
-  #   
-  #   if(1 %in% input$mapGroup){
-  #     p <- p + geom_point(data = tmp_df, aes(x=Longitude, y=Latitude), color = "red", shape = 42)
-  #   }       
-  #   if(2 %in% input$mapGroup){
-  #     p <- p + stat_density2d(data = tmp_df, aes(x=Longitude, y=Latitude, fill = ..level..)
-  #                             , alpha=0.5
-  #                             , geom ="polygon") +
-  #       scale_fill_gradientn(colours = rev(brewer.pal(3, "Spectral")))
-  #     
-  #     # geom_density2d(aes(fill = ..level..), alpha=0.5, geom="polygon") +
-  #     # scale_fill_gradientn(colours=rev(brewer.pal(3,"Spectral"))) +
-  #   }
-  #   if(3 %in% input$mapGroup){
-  #     p <- p + geom_path(data = california, aes(x=long, y=lat, group = group), colour = "white")
-  #   }
-  #   #work on logic for switching out layers
-  #   if(4 %in% input$mapGroup){
-  #     heat_df <- as.data.frame.matrix(as.data.table(table(tmp_df$CntyGEO)))
-  #     heat_df$V1 <- tolower(heat_df$V1)
-  #     heat_df <- dplyr::full_join(x = heat_df
-  #                                 , y = as.data.frame((california[california$region %in% "california",]))
-  #                                 , by = c("V1"="subregion")
-  #                                 , all = TRUE)
-  #     heat_df[is.na(heat_df$N), "N"] <- 0
-  #     heat_df <- heat_df[complete.cases(heat_df),]
-  #     p <- p + 
-  #       geom_polygon(data = heat_df, aes(x=long, y=lat, group = group, fill = log1p(N)), na.rm = TRUE) +
-  #       coord_fixed(1.3) +
-  #       scale_fill_gradientn(colours=rev(brewer.pal(3, "RdYlBu")))
-  #   }
-  #   #   p <- p + geom_polygon(data = tmp_df, aes(x=Longitude, y=Latitude, group = group
-  #   #                                            , fill = colorBuckets
-  #   #                                            , fill = cases_per_county
-  #   #                                            , fill = cases_per_pop
-  #   #                                            , fill = cases_per_area
-  #   #                                            )
-  #   #                         )
-  #   # }
-  #   
-  #   #scale_alpha
-  #   # stat_density2d(aes(x = Longitude, y = Latitude, fill = ..level.., alpha = ..level..)
-  #   #                , bins = 4, geom = "polygon", data = temp_df)
-  #   # scale_fill_gradient(low = "black", high = "blue")
-  #   p
-  # }
-  # )
+  #  Get ready for deletions
+  output$mapPlot <- renderPlot({
+    minDate <- as.Date(as.character(input$date_range[1]), format = '%Y-%m-%d')
+    maxDate <- as.Date(as.character(input$date_range[2]), format = '%Y-%m-%d')
+    # # tmp_df[(tmp_df$Latitude==""),]<-NA
+    # # tmp_df[(tmp_df$Longitude==""),]<-NA
+    # tmp_df[is.null(tmp_df$Longitude),]<- NA
+    # tmp_df<- tmp_df[!is.na(tmp_df$Longitude)|!is.na(tmp_df$Latitude),]
+    # tmp_df$Longitude <- as.numeric(as.character(tmp_df$Longitude))
+    # tmp_df$Latitude <- as.numeric(as.character(tmp_df$Latitude))
+    # tmp_df$DtEpisode <- as.Date(as.character(tmp_df$DtEpisode), format = '%m/%d/%y')
+
+    # For county heat mapping
+    #      as.data.frame.matrix(as.data.table(table(tmp_df$City)))
+    # test <- as.data.frame.matrix(as.data.table(table(tmp_df$CntyGEO)))
+    # test$V1 <- tolower(test$V1)
+    # meh <- merge(x = test
+    #              , y = as.data.frame((california[california$region %in% "california",]))
+    #              , by.x = "V1"
+    #              , by.y="subregion"
+    #              , all= TRUE)
+
+
+    #work on logic for switching out layers
+    if(4 %in% input$mapGroup){
+      heat_df <- as.data.frame.matrix(as.data.table(table(tmp_df$CntyGEO)))
+      heat_df$V1 <- tolower(heat_df$V1)
+      heat_df <- dplyr::full_join(x = heat_df
+                                  , y = as.data.frame((california[california$region %in% "california",]))
+                                  , by = c("V1"="subregion")
+                                  , all = TRUE)
+      heat_df[is.na(heat_df$N), "N"] <- 0
+      heat_df <- heat_df[complete.cases(heat_df),]
+      p <- p +
+        geom_polygon(data = heat_df, aes(x=long, y=lat, group = group, fill = log1p(N)), na.rm = TRUE) +
+        coord_fixed(1.3) +
+        scale_fill_gradientn(colours=rev(brewer.pal(3, "RdYlBu")))
+    }
+    #   p <- p + geom_polygon(data = tmp_df, aes(x=Longitude, y=Latitude, group = group
+    #                                            , fill = colorBuckets
+    #                                            , fill = cases_per_county
+    #                                            , fill = cases_per_pop
+    #                                            , fill = cases_per_area
+    #                                            )
+    #                         )
+    # }
+
+    #scale_alpha
+    # stat_density2d(aes(x = Longitude, y = Latitude, fill = ..level.., alpha = ..level..)
+    #                , bins = 4, geom = "polygon", data = temp_df)
+    # scale_fill_gradient(low = "black", high = "blue")
+    p
+  }
+  )
   # 
   # # tmp_df$CntyGEO <- tolower(tmp_df$CntyGEO)
   # # test <- inner_join(counties, tmp_df, by = c("subregion" = "CntyGEO"))
@@ -509,6 +554,9 @@
       write.csv(output$values, file)
     }
   )
+  
+  
+  
   # tableOutput
   #   output$my_tooltip <- renderUI({
   #   hover <- input$plot_hover 

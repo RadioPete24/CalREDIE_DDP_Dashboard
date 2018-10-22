@@ -103,7 +103,10 @@ sidebarLayout(
                                                                              , "Point Map" = "pt_map")
                                                         , selected = c("Incident Rate")
                                                         # , selectize = TRUE
-                                                        ))
+                                                        )),
+    conditionalPanel(condition = fC(c(2)), downloadButton("downloadMap", "Download Map")),
+    conditionalPanel(condition = fC(c(1, 5)), downloadButton("downloadPlot", "Download Map")),
+    conditionalPanel(condition = fC(c(4)), downloadButton("downloadValues", "Download Values"))
     # , conditionalPanel(condition = fC(c(2,3)), "input.tabs=='1'"
     #                  , downloadButton("downloadMap"
     #                                   , "Download Map")
@@ -121,16 +124,7 @@ sidebarLayout(
     # conditionalPanel(condition = fC(c(1, 2)), textInput("mapTitle", label = h5("Map:")
     #                                                  , value = "Enter Map Title:")),
     # 
-    # conditionalPanel(condition = "input.tabs=='1'"
-    #                  , downloadButton("downloadMap", "Download Map")),
-    # 
-    # conditionalPanel(condition = "input.tabs=='2'"
-    #                  , downloadButton("downloadValues", "Download Values")
-    # )
 
-  #   conditionalPanel(condition = "input.tabs=='3'"
-  #                    , downloadButton("download", "Download")
-  #   ),
   #   # Select Region for map of interest
   #   selectizeInput("region", label = h5("Select Region:")
   #                  , choices = list("State" = 1, "County" = 2, "City" = 3)
@@ -153,28 +147,34 @@ tabPanel("Demographics",
          #                                                            , choices = c(""
          #                                                                          , "")
          #                                                            , selected = c("ALL"))),
-         conditionalPanel(condition = fC(c(1,2,3,4,5)), selectInput("gender"
-                                                             , label = h5("Gender")
-                                                             , choices = c("Total"
-                                                                           , "Male"
-                                                                           , "Female")
-                                                             , selected = c("Total")
-  ))
-)),
+         conditionalPanel(condition = fC(c(1,2,3,4,5)), uiOutput("Sex")),
+         conditionalPanel(condition = fC(c(1,2,3,4,5)), uiOutput("ethnicity")),
+         conditionalPanel(condition = fC(c(1,2,3,4,5)), uiOutput("race"))
+         
+         # conditionalPanel(condition = fC(c(1,2,3,4,5)), selectInput("gender"
+         #                                                     , label = h5("Gender")
+         #                                                     , choices = c("Total"
+         #                                                                   , "Male"
+         #                                                                   , "Female")
+         #                                                     , selected = c("Total"))
+         )
+),
 
-helpText(n1), br(),
-helpText(n2, style="color:red"), br(),
-HTML('<center><img src="CalREDIE_logo.jpg" height="70" width="250"></center>')
-# helpText("LINKS",tags$a(href="https://www.cdph.ca.gov/Programs/DDP/Pages/Data-and-Statistics-.aspx", 
-#                         h6("CalREDIE Reporting Application")),
-#          tags$a(href="https://cdph.ca.gov/",
-#                 h6("Webpage of CDPH CalREDIE")),
-#          tags$a(href="https://www.census.gov/programs-surveys/acs/",
-#                 h6("American Community Survey")),  style="color:blue"))
+helpText(n1)
+, br()
+, helpText(n2, style="color:red")
+, br()
+, HTML('<center><img src="CalREDIE_logo.jpg" height="70" width="250"></center>')
+, helpText("LINKS",tags$a(href="https://www.cdph.ca.gov/Programs/DDP/Pages/Data-and-Statistics-.aspx",
+                        h6("CalREDIE Reporting Application")),
+         tags$a(href="https://cdph.ca.gov/",
+                h6("Webpage of CDPH CalREDIE")),
+         tags$a(href="https://www.census.gov/programs-surveys/acs/",
+                h6("American Community Survey")),  style="color:blue")
 # sidebarLayout(sidebarPanel(position = "right",
 # fluidRow(column(10, wellPanel(
 # Show a plot of the generated distribution
-),
+, id = "ID"),
 mainPanel(
   hr(),
   # tabPanel("Data file", tableOutput("guess")
@@ -185,24 +185,22 @@ mainPanel(
   tabsetPanel(type = "tabs",
               tabPanel("Histogram"
                        , plotOutput("distPlot", width = "100%", click = "plot1_click"), value = 1)
-              # , tabPanel("Map (Static)", plotOutput("CRsMapPlot", width = 700, height = 700
-              #                                       # , click = "plot1_click"
-              #                                       , value = 2))
+              , tabPanel("Map (Static)", plotOutput("CRsMapPlot", width = 700, height = 700
+                                                    # , click = "plot1_click"
+                                                    , value = 2))
               , tabPanel("Map (Zoom)", leafletOutput("CRzMapPlot", width = 700, height = 700
                                                    # , click = "plot1_click"
                                                    ), value = 3)
               # , tabPanel("Values", tableOutput("values"), value = "4")
               , tabPanel("County Cases", plotOutput("cntyPlot"), width = "100%", value = 5)
-              
-              # , tabPanel("County_table", tableOutput("cntyPlot"))
               , id = "ID" )
   
-  # , tableOutput("rstat")
+  # tableOutput("rstat")
 
   )
 )
 # , dashboardBody(
 #   tags$head(
 #     tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
-  )
+)
 )

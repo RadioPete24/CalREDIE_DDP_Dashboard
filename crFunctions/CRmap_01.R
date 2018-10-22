@@ -6,8 +6,8 @@ CRmap01 <- function(mapBorder = "County", mapLayer = "inc_rt"){
     labs(title = input$mapTitle
          , x = "Longitude"
          , y = "Latitude")
-  
-  if(mapGroup == "pt_map"){
+  # 
+  # if(mapGroup == "pt_map"){
     if("pt_map" %in% mapLayer){
       
       p <- p + geom_point(data = tmp_df, aes(x=Longitude, y=Latitude), color = "red", shape = 42)

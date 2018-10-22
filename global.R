@@ -33,7 +33,7 @@ source(file.path(myGIS_install, "gis_install_pkg.R"))
 
 source(file.path(myFunctions, "tsvFile.R"))
 source(file.path(myFunctions, "CRmap_00.R")) # Zoom Map
-source(file.path(myFunctions, "CRmap_01.R")) # Static Map
+# source(file.path(myFunctions, "CRmap_01.R")) # Static Map
 #source(file.path(myFunctions, "dateRange.R"))
 
 # USE consistent map projection system throughout all app code !

@@ -13,12 +13,12 @@ CRmap00 <- function(mapBorder = "County", mapLayer = "inc_rt", tmp_df = tmp_df){
   #require(leaflet)
   # devtools::install_github("rstudio/leaflet")
   zMap_border <- leaflet(data = subdatCounty) %>%
-    setView(lng= -121.650, lat = 37.651, zoom = 6) %>% 
+    setView(lng= -121.0, lat = 37.651, zoom = 6) %>%
     addTiles()
   #County Data
   if("County" %in% mapBorder){
-    # zMap_border <- zMap_border %>%
-      zMap_border <- leafletProxy('zMap_border') %>%
+    zMap_border <- zMap_border %>%
+      # zMap_border <- leafletProxy('zMap_border') %>%
       # addProviderTiles("CartoDB.Positron") %>% (need to obtain map of provider map)
       addPolygons(data = subdatCounty, weight=1, col = "#2d09e5", fillOpacity = 0)
   }

@@ -55,6 +55,12 @@ tsvFile <- function(input, output, session, stringsAsFactors = FALSE){
     #Format and handle null date information
     # tmp_df$DtEpisode <- strptime(as.character(tmp_df$DtEpisode), format = '%m/%d/%Y')
     # tmp_df$DtEpisode <- as.Date(as.character(tmp_df$DtEpisode), format = '%m/%d/%y')
+    # test$quintile <- ntile(tmp_df$Age, 5)
+    # test$quintile <- cut(tmp_df$Age, breaks = quantile(tmp_df$Age, probs = seq(0,1,0.2)), include.lowest = TRUE)
+    # test <- as.data.table(test)
+    # test[, quintile := cut(tmp_df$Age, breaks = quantile(tmp_df$Age, probs = seq(0,1,0.2)), include.lowest = TRUE)]
+    # gsub(pattern = ",", replacement = "-", x = test$quintile)
+    # gsub(pattern = "\\(|\\]", replacement = "", x = test$quintile)
     
     tmp_df <- tmp_df[!is.na(tmp_df$DtEpisode),]
     tmp_df <- tmp_df[!is.null(tmp_df$DtEpisode),]
