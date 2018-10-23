@@ -369,25 +369,15 @@
       
       counties <- map_data("county")
       california <- subset(counties, region == "california")
-      #or_county <- subset(counties, region == "oregon")
-      # ca_county <- subset(counties, region == "california")
-      # For county heat mapping 
-      #      as.data.frame.matrix(as.data.table(table(tmp_df$City)))
-      # test <- as.data.frame.matrix(as.data.table(table(tmp_df$CntyGEO)))
-      # test$V1 <- tolower(test$V1)
-      # meh <- merge(x = test
-      #              , y = as.data.frame((california[california$region %in% "california",]))
-      #              , by.x = "V1"
-      #              , by.y="subregion"
-      #              , all= TRUE)
+    
       hist_df <- cbind(as.data.table(table(tmp_df$LHJ))
                        , as.data.table(as.data.frame.matrix(table(tmp_df$LHJ, factor(tmp_df$RStatus)))))
       hist_df[hist_df$V1=="Berkeley",]$V1 <- "Alameda"
       hist_df[hist_df$V1=="Long Beach",]$V1 <- "Los Angeles"
-      hist_df <- setDT(hist_df)[, .(Freq=sum(Confirmed)), by = .(V1)]
-      hist_df <- 
+      #Using only 'confirmed' cases - possibly change to selection of Rstatus cases in the future
+      hist_df <- setDT(hist_df)[, .(Freq=sum(Confirmed)), by = .(V1)] 
         
-        census_info <- merge(cnty_freq_df, census_info, by.x = "Var1", by.y = "GEO.display.label")
+      census_info <- merge(hist_df, census_info, by.x = "V1", by.y = "GEO.display.label")
       # census_info <- left_join(cnty_freq_df, census_info, by = c("Var1"="GEO.display.label"))
       
       #Measures
@@ -397,9 +387,23 @@
       
       ##Need to work on developing heat map for multiple RStatus conditons##
       
-      census_info <- census_info %>% rename(id = GEO.id2, geography = Var1, total = respop72017, cases = Freq)
+      census_info <- census_info %>% rename(id = GEO.id2, geography = V1, total = respop72017, cases = Freq)
+      census_info$V1 <- tolower(census_info$V1)
+      census_info <- dplyr::full_join(x = census_info[,incidence_rt, V1]
+                                 , y = as.data.frame((california[california$region %in% "california",])), by = c("V1" = "subregion"), all = TRUE)
+      
+      # test_df[is.na(test_df$incidence_rt), "incidence_rt"] <- 0
+      # test_df <- test_df[complete.cases(test_df),]
+      
+      heat_df$V1 <- tolower(heat_df$V1)
+      heat_df <- dplyr::full_join(x = heat_df
+                                  , y = as.data.frame((california[california$region %in% "california",]))
+                                  , by = c("V1"="subregion")
+                                  , all = TRUE)
+      heat_df[is.na(heat_df$N), "N"] <- 0
+      heat_df <- heat_df[complete.cases(heat_df),]
     # join tabular data (ggtract from updateCR) for ggplot preparations
-    ggtract<-left_join(ggtract, test3, by=c("id"))
+    # ggtract<-left_join(ggtract, test3, by=c("id"))
 
     p <- CRmap01(mapBorder=input$mapBorder, mapLayer=input$mapLayer, tmp_df=tmp_df)
     p
@@ -460,59 +464,59 @@
   # #              tmp_df$wt[which.min(dist)]
   # #    }
   #  Get ready for deletions
-  output$mapPlot <- renderPlot({
-    minDate <- as.Date(as.character(input$date_range[1]), format = '%Y-%m-%d')
-    maxDate <- as.Date(as.character(input$date_range[2]), format = '%Y-%m-%d')
-    # # tmp_df[(tmp_df$Latitude==""),]<-NA
-    # # tmp_df[(tmp_df$Longitude==""),]<-NA
-    # tmp_df[is.null(tmp_df$Longitude),]<- NA
-    # tmp_df<- tmp_df[!is.na(tmp_df$Longitude)|!is.na(tmp_df$Latitude),]
-    # tmp_df$Longitude <- as.numeric(as.character(tmp_df$Longitude))
-    # tmp_df$Latitude <- as.numeric(as.character(tmp_df$Latitude))
-    # tmp_df$DtEpisode <- as.Date(as.character(tmp_df$DtEpisode), format = '%m/%d/%y')
-
-    # For county heat mapping
-    #      as.data.frame.matrix(as.data.table(table(tmp_df$City)))
-    # test <- as.data.frame.matrix(as.data.table(table(tmp_df$CntyGEO)))
-    # test$V1 <- tolower(test$V1)
-    # meh <- merge(x = test
-    #              , y = as.data.frame((california[california$region %in% "california",]))
-    #              , by.x = "V1"
-    #              , by.y="subregion"
-    #              , all= TRUE)
-
-
-    #work on logic for switching out layers
-    if(4 %in% input$mapGroup){
-      heat_df <- as.data.frame.matrix(as.data.table(table(tmp_df$CntyGEO)))
-      heat_df$V1 <- tolower(heat_df$V1)
-      heat_df <- dplyr::full_join(x = heat_df
-                                  , y = as.data.frame((california[california$region %in% "california",]))
-                                  , by = c("V1"="subregion")
-                                  , all = TRUE)
-      heat_df[is.na(heat_df$N), "N"] <- 0
-      heat_df <- heat_df[complete.cases(heat_df),]
-      p <- p +
-        geom_polygon(data = heat_df, aes(x=long, y=lat, group = group, fill = log1p(N)), na.rm = TRUE) +
-        coord_fixed(1.3) +
-        scale_fill_gradientn(colours=rev(brewer.pal(3, "RdYlBu")))
-    }
-    #   p <- p + geom_polygon(data = tmp_df, aes(x=Longitude, y=Latitude, group = group
-    #                                            , fill = colorBuckets
-    #                                            , fill = cases_per_county
-    #                                            , fill = cases_per_pop
-    #                                            , fill = cases_per_area
-    #                                            )
-    #                         )
-    # }
-
-    #scale_alpha
-    # stat_density2d(aes(x = Longitude, y = Latitude, fill = ..level.., alpha = ..level..)
-    #                , bins = 4, geom = "polygon", data = temp_df)
-    # scale_fill_gradient(low = "black", high = "blue")
-    p
-  }
-  )
+  # output$mapPlot <- renderPlot({
+  #   minDate <- as.Date(as.character(input$date_range[1]), format = '%Y-%m-%d')
+  #   maxDate <- as.Date(as.character(input$date_range[2]), format = '%Y-%m-%d')
+  #   # # tmp_df[(tmp_df$Latitude==""),]<-NA
+  #   # # tmp_df[(tmp_df$Longitude==""),]<-NA
+  #   # tmp_df[is.null(tmp_df$Longitude),]<- NA
+  #   # tmp_df<- tmp_df[!is.na(tmp_df$Longitude)|!is.na(tmp_df$Latitude),]
+  #   # tmp_df$Longitude <- as.numeric(as.character(tmp_df$Longitude))
+  #   # tmp_df$Latitude <- as.numeric(as.character(tmp_df$Latitude))
+  #   # tmp_df$DtEpisode <- as.Date(as.character(tmp_df$DtEpisode), format = '%m/%d/%y')
+  # 
+  #   # For county heat mapping
+  #   #      as.data.frame.matrix(as.data.table(table(tmp_df$City)))
+  #   # test <- as.data.frame.matrix(as.data.table(table(tmp_df$CntyGEO)))
+  #   # test$V1 <- tolower(test$V1)
+  #   # meh <- merge(x = test
+  #   #              , y = as.data.frame((california[california$region %in% "california",]))
+  #   #              , by.x = "V1"
+  #   #              , by.y="subregion"
+  #   #              , all= TRUE)
+  # 
+  # 
+  #   #work on logic for switching out layers
+  #   if(4 %in% input$mapGroup){
+  #     heat_df <- as.data.frame.matrix(as.data.table(table(tmp_df$CntyGEO)))
+  #     heat_df$V1 <- tolower(heat_df$V1)
+  #     heat_df <- dplyr::full_join(x = heat_df
+  #                                 , y = as.data.frame((california[california$region %in% "california",]))
+  #                                 , by = c("V1"="subregion")
+  #                                 , all = TRUE)
+  #     heat_df[is.na(heat_df$N), "N"] <- 0
+  #     heat_df <- heat_df[complete.cases(heat_df),]
+  #     p <- p +
+  #       geom_polygon(data = heat_df, aes(x=long, y=lat, group = group, fill = log1p(N)), na.rm = TRUE) +
+  #       coord_fixed(1.3) +
+  #       scale_fill_gradientn(colours=rev(brewer.pal(3, "RdYlBu")))
+  #   }
+  #   #   p <- p + geom_polygon(data = tmp_df, aes(x=Longitude, y=Latitude, group = group
+  #   #                                            , fill = colorBuckets
+  #   #                                            , fill = cases_per_county
+  #   #                                            , fill = cases_per_pop
+  #   #                                            , fill = cases_per_area
+  #   #                                            )
+  #   #                         )
+  #   # }
+  # 
+  #   #scale_alpha
+  #   # stat_density2d(aes(x = Longitude, y = Latitude, fill = ..level.., alpha = ..level..)
+  #   #                , bins = 4, geom = "polygon", data = temp_df)
+  #   # scale_fill_gradient(low = "black", high = "blue")
+  #   p
+  # }
+  # )
   # 
   # # tmp_df$CntyGEO <- tolower(tmp_df$CntyGEO)
   # # test <- inner_join(counties, tmp_df, by = c("subregion" = "CntyGEO"))

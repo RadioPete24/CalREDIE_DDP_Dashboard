@@ -1,5 +1,5 @@
-CRmap01 <- function(mapBorder = "County", mapLayer = "inc_rt"){
-  p <- ggplot() + geom_polygon(data = california, aes(x=long, y=lat, group = group)) + 
+CRmap01 <- function(mapBorder = "County", mapLayer = "inc_rt" tmp_df = tmp_df, test_df = test_df){
+  sMap_border <- ggplot() + geom_polygon(data = california, aes(x=long, y=lat, group = group)) + 
     geom_polygon(color = "white", fill = "gray") +
     # + coord_fixed(1.3) +
     xlim(-130, -107) + ylim(31.5,43) +
@@ -10,10 +10,12 @@ CRmap01 <- function(mapBorder = "County", mapLayer = "inc_rt"){
   # if(mapGroup == "pt_map"){
     if("pt_map" %in% mapLayer){
       
-      p <- p + geom_point(data = tmp_df, aes(x=Longitude, y=Latitude), color = "red", shape = 42)
+      sMap_border <- sMap_border + 
+        geom_point(data = tmp_df, aes(x=Longitude, y=Latitude), color = "red", shape = 42)
     }       
     if("ht_map" %in% mapLayer){
-      p <- p + stat_density2d(data = tmp_df, aes(x=Longitude, y=Latitude, fill = ..level..)
+      sMap_border <- sMap_border + 
+        stat_density2d(data = tmp_df, aes(x=Longitude, y=Latitude, fill = ..level..)
                               , alpha=0.5
                               , geom ="polygon") +
         scale_fill_gradientn(colours = rev(brewer.pal(3, "Spectral")))
@@ -21,27 +23,34 @@ CRmap01 <- function(mapBorder = "County", mapLayer = "inc_rt"){
       # geom_density2d(aes(fill = ..level..), alpha=0.5, geom="polygon") +
       # scale_fill_gradientn(colours=rev(brewer.pal(3,"Spectral"))) +
     }
-    if("County" %in% mapBorder){
-      p <- p + geom_path(data = california, aes(x=long, y=lat, group = group), colour = "white")
-    }
-    #work on logic for switching out layers
-    if(4 %in% measure){
-      heat_df <- as.data.frame.matrix(as.data.table(table(tmp_df$CntyGEO)))
-      heat_df$V1 <- tolower(heat_df$V1)
-      heat_df <- dplyr::full_join(x = heat_df
-                                  , y = as.data.frame((california[california$region %in% "california",]))
-                                  , by = c("V1"="subregion")
-                                  , all = TRUE)
-      heat_df[is.na(heat_df$N), "N"] <- 0
-      heat_df <- heat_df[complete.cases(heat_df),]
-      p <- p + 
-        geom_polygon(data = heat_df, aes(x=long, y=lat, group = group, fill = log1p(N)), na.rm = TRUE) +
-        coord_fixed(1.3) +
+    if ("inc_rt" %in% mapLayer){
+      sMap_border <- sMap_border + 
+        geom_polygon(data = test_df, aes(x=long, y = lat, group = group, fill = log1p(incidence_rt)), na.rm = TRUE) + 
+        coord_fixed(1.3) + 
         scale_fill_gradientn(colours=rev(brewer.pal(3, "RdYlBu")))
+      # popup <- paste0("GEOID: ", df.polygon@data$NAME
+      #                 , "<br>", "Incidence Rate of Counties: "
+      #                 , round(df.polygon@data$incidence_rt,3)
+      #                 , sep = " ")
+      # pal <- colorNumeric(palette = "YlGnBu"
+      #                     , domain = df.polygon@data$incidence_rt
+      #                     # , n = 7
+      # )
+      # zMap_border <- zMap_border %>%
+      #   # addProviderTiles("CartoDB.Positron") %>%
+      #   addPolygons(data = df.polygon, fillColor = ~pal(incidence_rt), color = "#b2aeae", fillOpacity = 0.7, weight = 0.3, smoothFactor = 0.2, popup = popup) %>%
+      #   addLegend(pal = pal, values = df.polygon$incidence_rt, position = "bottomleft", title = "Incidence Rate of Cases", labFormat = labelFormat(suffix = " cases per 100000"))
     }
-    p
+    if("County" %in% mapBorder){
+      sMap_border <- sMap_border + geom_path(data = california, aes(x=long, y=lat, group = group), colour = "white")
+    }
+    # if("City" %in% mapBorder){
+    #   p <- p + geom_path(data = cities?, aes(x = long, y = lat, group = group), colour = "green")
+    # }
+    #work on logic for switching out layers
+
+  sMap_border
   }
-}
 
 #Static Map
 # CRmapLeaflet <- function(myLHJ, myCause=0, myMeasure = "YLLper", myYear=2015, myGeo="Census Tract") {

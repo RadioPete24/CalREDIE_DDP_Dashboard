@@ -34,13 +34,13 @@ CRmap00 <- function(mapBorder = "County", mapLayer = "inc_rt", tmp_df = tmp_df){
                     , round(df.polygon@data$incidence_rt,3)
                     , sep = " ")
     pal <- colorNumeric(palette = "YlGnBu"
-                        , domain = df.polygon@data$incidence_rt
+                        , domain = log1p(df.polygon@data$incidence_rt)
                         # , n = 7
     )
     zMap_border <- zMap_border %>%
       # addProviderTiles("CartoDB.Positron") %>%
       addPolygons(data = df.polygon, fillColor = ~pal(incidence_rt), color = "#b2aeae", fillOpacity = 0.7, weight = 0.3, smoothFactor = 0.2, popup = popup) %>%
-      addLegend(pal = pal, values = df.polygon$incidence_rt, position = "bottomleft", title = "Incidence Rate of Cases", labFormat = labelFormat(suffix = " cases per 100000"))
+      addLegend(pal = pal, values = df.polygon@data$incidence_rt, position = "bottomleft", title = "Incidence Rate of Cases", labFormat = labelFormat(suffix = " cases per 100000"))
   }
   if("pt_map" %in% mapLayer){
     zMap_border <- zMap_border %>%

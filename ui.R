@@ -1,7 +1,7 @@
 
 n1 <- "CalREDIE DDP Data Dashboard 0.1.0"
 
-n2 <- "Description:"
+n2 <- "Description: The CalREDIE DDP Data Dashboard is a dashboard to automate reporting of data selected by the user that has been obtained by CalREDIE's Data Distribution Portal (DDP)."
 
 #
 # This is the user-interface definition of a Shiny web application. You can
@@ -39,13 +39,7 @@ sidebarLayout(
     uiOutput("binRange"),
     # uiOutput("mapLayer"),
     
-    # conditionalPanel(condition = fC(c(, 2, )),        selectizeInput("region", label = h5("Select Region:")
-    # , choices = list("State" = 1, "County" = 2, "City" = 3)
-    # , selected = 1),) 
-    #                                       , 
-    #                  )
-
-    # conditionalPanel(condition = fC(c(4))
+     # conditionalPanel(condition = fC(c(4))
     #                  , checkboxGroupInput("mapGroup", label = h5("Mapping Options:")
     #                                                 , inline = TRUE
     #                                                 , choiceNames = list("Points", "Density", "Cnty_Lines", "Heat")
@@ -87,7 +81,7 @@ sidebarLayout(
 
     conditionalPanel(condition = fC(c(5)), textInput("cntyRnkTitle", label = h5("County Rank Title:")
                                                      , value = "Enter Title for County Cases:")),
-    conditionalPanel(condition = fC(c(3)), checkboxGroupInput("mapBorder"
+    conditionalPanel(condition = fC(c(2,3)), checkboxGroupInput("mapBorder"
                                                                  , label = h5("Border Selections")
                                                                  , inline = TRUE
                                                                  , choiceNames = list("County"
@@ -96,13 +90,12 @@ sidebarLayout(
                                                                                     , "City")
                                                                  , selected = c("County")
                                                                  )),
-    conditionalPanel(condition = fC(c(3)), selectInput("mapLayer"
+    conditionalPanel(condition = fC(c(2,3)), selectInput("mapLayer"
                                                         , label = h5("Measure Selection")
                                                         , choices = c("Incident Rate" = "inc_rt"
                                                                              , "Heat Map" = "ht_map"
                                                                              , "Point Map" = "pt_map")
                                                         , selected = c("Incident Rate")
-                                                        # , selectize = TRUE
                                                         )),
     conditionalPanel(condition = fC(c(2)), downloadButton("downloadMap", "Download Map")),
     conditionalPanel(condition = fC(c(1, 5)), downloadButton("downloadPlot", "Download Map")),
@@ -185,17 +178,16 @@ mainPanel(
   tabsetPanel(type = "tabs",
               tabPanel("Histogram"
                        , plotOutput("distPlot", width = "100%", click = "plot1_click"), value = 1)
-              , tabPanel("Map (Static)", plotOutput("CRsMapPlot", width = 700, height = 700
+              , tabPanel("Map (Static)", plotOutput("CRsMapPlot", width = 700, height = 700)
                                                     # , click = "plot1_click"
-                                                    , value = 2))
-              , tabPanel("Map (Zoom)", leafletOutput("CRzMapPlot", width = 700, height = 700
+                         , value = 2)
+              , tabPanel("Map (Zoom)", leafletOutput("CRzMapPlot", width = 700, height = 700)
                                                    # , click = "plot1_click"
-                                                   ), value = 3)
-              # , tabPanel("Values", tableOutput("values"), value = "4")
+                         , value = 3)
+              # , tabPanel("Values", dataTableOutput("values"), value = "4") #DT:: #For output of input values chosen
+              # , tabPanel("Population", dataTableOutput()) #DT:: #For output of population demographics
               , tabPanel("County Cases", plotOutput("cntyPlot"), width = "100%", value = 5)
               , id = "ID" )
-  
-  # tableOutput("rstat")
 
   )
 )
