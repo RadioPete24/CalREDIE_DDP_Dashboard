@@ -327,7 +327,7 @@
     
     ##Need to work on developing heat map for multiple RStatus conditons##
     
-    census_info <- census_info %>% rename(id = GEO.id2, geography = Var1, total = respop72017, cases = Freq)
+    census_info <- census_info %>% dplyr::rename(id = GEO.id2, geography = Var1, total = respop72017, cases = Freq)
     
     #Transformed from standard data and local data to rename columns and format class type
     # tmp <- mutate(census_info[census_info$Var2==input$rptGroup,]
@@ -366,47 +366,56 @@
                        & tmp_df$Ethnicity %in% c(input$Ethnicity)
                        # & tmp_df$Quintile %in% ageGrp
                        ,]
-      
+
       counties <- map_data("county")
       california <- subset(counties, region == "california")
-    
+
       hist_df <- cbind(as.data.table(table(tmp_df$LHJ))
                        , as.data.table(as.data.frame.matrix(table(tmp_df$LHJ, factor(tmp_df$RStatus)))))
       hist_df[hist_df$V1=="Berkeley",]$V1 <- "Alameda"
       hist_df[hist_df$V1=="Long Beach",]$V1 <- "Los Angeles"
       #Using only 'confirmed' cases - possibly change to selection of Rstatus cases in the future
-      hist_df <- setDT(hist_df)[, .(Freq=sum(Confirmed)), by = .(V1)] 
-        
+      hist_df <- setDT(hist_df)[, .(Freq=sum(Confirmed)), by = .(V1)]
+
       census_info <- merge(hist_df, census_info, by.x = "V1", by.y = "GEO.display.label")
       # census_info <- left_join(cnty_freq_df, census_info, by = c("Var1"="GEO.display.label"))
-      
+
       #Measures
       census_info$incidence_rt <- (as.numeric(census_info$Freq)*100000)/as.numeric(census_info$respop72017)
       census_info$st_err <- as.numeric(census_info$incidence_rt)/(as.numeric(census_info$respop72017)^.5)
       census_info$rel_sterr <- (census_info$st_err*100)/census_info$incidence_rt
-      
+
       ##Need to work on developing heat map for multiple RStatus conditons##
+
+      # census_info <- census_info %>% dplyr::rename(id = GEO.id2, geography = V1, total = respop72017, cases = Freq)
+      # census_info$geography <- tolower(census_info$geography)
+      # census_info <- dplyr::full_join(x = census_info[,incidence_rt, geography]
+      #                            , y = as.data.frame((california[california$region %in% "california",]))
+      #                            , by = c("geography" = "subregion"), all = TRUE)
+      # 
+      # census_info[is.na(census_info$incidence_rt), "incidence_rt"] <- 0
+      # census_info <- census_info[complete.cases(census_info),]
       
-      census_info <- census_info %>% rename(id = GEO.id2, geography = V1, total = respop72017, cases = Freq)
       census_info$V1 <- tolower(census_info$V1)
       census_info <- dplyr::full_join(x = census_info[,incidence_rt, V1]
-                                 , y = as.data.frame((california[california$region %in% "california",])), by = c("V1" = "subregion"), all = TRUE)
+                                      , y = as.data.frame((california[california$region %in% "california",]))
+                                      , by = c("V1" = "subregion"), all = TRUE)
       
-      # test_df[is.na(test_df$incidence_rt), "incidence_rt"] <- 0
-      # test_df <- test_df[complete.cases(test_df),]
+      census_info[is.na(census_info$incidence_rt), "incidence_rt"] <- 0
+      census_info <- census_info[complete.cases(census_info),]
       
-      heat_df$V1 <- tolower(heat_df$V1)
-      heat_df <- dplyr::full_join(x = heat_df
-                                  , y = as.data.frame((california[california$region %in% "california",]))
-                                  , by = c("V1"="subregion")
-                                  , all = TRUE)
-      heat_df[is.na(heat_df$N), "N"] <- 0
-      heat_df <- heat_df[complete.cases(heat_df),]
-    # join tabular data (ggtract from updateCR) for ggplot preparations
-    # ggtract<-left_join(ggtract, test3, by=c("id"))
-
-    p <- CRmap01(mapBorder=input$mapBorder, mapLayer=input$mapLayer, tmp_df=tmp_df)
-    p
+      sMap_border <- ggplot() + geom_polygon(data = california, aes(x=long, y=lat, group = group)) + 
+        geom_polygon(color = "white", fill = "gray") +
+        # + coord_fixed(1.3) +
+        xlim(-130, -107) + ylim(31.5,43) +
+        labs(title = input$mapTitle
+             , x = "Longitude"
+             , y = "Latitude") +
+        theme(plot.background = element_blank())
+      
+      sMap_border
+    # p <- CRmap01(mapBorder=input$mapBorder, mapLayer=input$mapLayer, tmp_df=tmp_df, census_info = census_info)
+    # p
     }
   )
   

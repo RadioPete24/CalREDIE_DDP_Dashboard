@@ -1,32 +1,34 @@
-CRmap01 <- function(mapBorder = "County", mapLayer = "inc_rt" tmp_df = tmp_df, test_df = test_df){
-  sMap_border <- ggplot() + geom_polygon(data = california, aes(x=long, y=lat, group = group)) + 
-    geom_polygon(color = "white", fill = "gray") +
-    # + coord_fixed(1.3) +
+CRmap01 <- function(mapBorder = "County", mapLayer = "inc_rt", tmp_df = tmp_df, census_info = census_info){
+  sMap_border <- ggplot() + geom_polygon(data = california, aes(x=long, y=lat, group = group)) +
+    geom_polygon(color = "black", fill = "gray") +
+    coord_fixed(1.3) +
     xlim(-130, -107) + ylim(31.5,43) +
     labs(title = input$mapTitle
          , x = "Longitude"
-         , y = "Latitude")
-  # 
+         , y = "Latitude") +
+    theme(plot.background = element_blank()) +
+    theme_nothing()
+  
   # if(mapGroup == "pt_map"){
     if("pt_map" %in% mapLayer){
-      
-      sMap_border <- sMap_border + 
+
+      sMap_border <- sMap_border +
         geom_point(data = tmp_df, aes(x=Longitude, y=Latitude), color = "red", shape = 42)
-    }       
+    }
     if("ht_map" %in% mapLayer){
-      sMap_border <- sMap_border + 
+      sMap_border <- sMap_border +
         stat_density2d(data = tmp_df, aes(x=Longitude, y=Latitude, fill = ..level..)
                               , alpha=0.5
                               , geom ="polygon") +
         scale_fill_gradientn(colours = rev(brewer.pal(3, "Spectral")))
-      
+
       # geom_density2d(aes(fill = ..level..), alpha=0.5, geom="polygon") +
       # scale_fill_gradientn(colours=rev(brewer.pal(3,"Spectral"))) +
     }
     if ("inc_rt" %in% mapLayer){
-      sMap_border <- sMap_border + 
-        geom_polygon(data = test_df, aes(x=long, y = lat, group = group, fill = log1p(incidence_rt)), na.rm = TRUE) + 
-        coord_fixed(1.3) + 
+      sMap_border <- sMap_border +
+        geom_polygon(data = test_df, aes(x=long, y = lat, group = group, fill = log1p(incidence_rt)), na.rm = TRUE) +
+        coord_fixed(1.3) +
         scale_fill_gradientn(colours=rev(brewer.pal(3, "RdYlBu")))
       # popup <- paste0("GEOID: ", df.polygon@data$NAME
       #                 , "<br>", "Incidence Rate of Counties: "
@@ -50,7 +52,10 @@ CRmap01 <- function(mapBorder = "County", mapLayer = "inc_rt" tmp_df = tmp_df, t
     #work on logic for switching out layers
 
   sMap_border
-  }
+}
+
+
+
 
 #Static Map
 # CRmapLeaflet <- function(myLHJ, myCause=0, myMeasure = "YLLper", myYear=2015, myGeo="Census Tract") {
