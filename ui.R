@@ -178,13 +178,16 @@ mainPanel(
   tabsetPanel(type = "tabs",
               tabPanel("Histogram"
                        , plotOutput("distPlot", width = "100%", click = "plot1_click"), value = 1)
-              , tabPanel("Map (Static)", plotOutput("CRstMapPlot", width = 700, height = 700)
-                                                    # , click = "plot1_click"
+              # , tabPanel("Map (Static)", plotOutput("CRstMapPlot", width = 700, height = 700)
+              #                                       # , click = "plot1_click"
+              #            , value = 2)
+              , tabPanel("Map (Static)", plotOutput("CRstMapPlot")
+                         # , click = "plot1_click"
                          , value = 2)
               , tabPanel("Map (Zoom)", leafletOutput("CRzMapPlot", width = 700, height = 700)
                                                    # , click = "plot1_click"
                          , value = 3)
-              # , tabPanel("Values", dataTableOutput("values"), value = "4") #DT:: #For output of input values chosen
+              , tabPanel("Values", dataTableOutput("values"), value = "4") #DT:: #For output of input values chosen
               # , tabPanel("Population", dataTableOutput()) #DT:: #For output of population demographics
               , tabPanel("County Cases", plotOutput("cntyPlot"), width = "100%", value = 5)
               , id = "ID" )

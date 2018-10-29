@@ -32,8 +32,9 @@ source(file.path(myGIS_install, "gis_install_pkg.R"))
 # sapply(file.path(paste0(myFunctions, myFunction_list)), FUN = function(x){ifelse (file.exists(x), source(x), warning("file does not exists"))}, .GlobalEnv)
 
 source(file.path(myFunctions, "tsvFile.R"))
-source(file.path(myFunctions, "CRmap_00.R")) # Zoom Map
-# source(file.path(myFunctions, "CRmap_01.R")) # Static Map
+source(file.path(myFunctions, "CRmap_00.R"))# Zoom Map
+source(file.path(myFunctions, "CRmap_01.R"))# Static Map
+
 #source(file.path(myFunctions, "dateRange.R"))
 
 # USE consistent map projection system throughout all app code !
@@ -105,6 +106,9 @@ dat_county <- county.fips[which(substring(county.fips$fips, 1, 1)=='6'),]
 dat_county <- mutate(dat_county
                      , fips = substring(dat_county$fips, 2)
                      , polyname = substring(dat_county$polyname, 12))
+
+counties <- map_data("county")
+california <- subset(counties, region == "california")
 
 #-- Load Info Files and Functions ------------------------------------------------------------------------
 

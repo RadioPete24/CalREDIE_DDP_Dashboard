@@ -1,53 +1,57 @@
-CRmap01 <- function(mapBorder = "County", mapLayer = "inc_rt", tmp_df = tmp_df, census_info = census_info){
+# CRmap01 <- function(mapBorder = NULL, mapLayer = NULL, tmp_df = tmp_df){
+CRmap01 <- function(mapLayer = "inc_rt", tmp_df, census_info){
   sMap_border <- ggplot() + geom_polygon(data = california, aes(x=long, y=lat, group = group)) +
     geom_polygon(color = "black", fill = "gray") +
     coord_fixed(1.3) +
     xlim(-130, -107) + ylim(31.5,43) +
-    labs(title = input$mapTitle
-         , x = "Longitude"
+    labs(x = "Longitude"
          , y = "Latitude") +
-    theme(plot.background = element_blank()) +
+    # theme(plot.background = element_blank()) +
     theme_nothing()
   
-  # if(mapGroup == "pt_map"){
-    if("pt_map" %in% mapLayer){
+# if(mapGroup == "pt_map"){
+  if("pt_map" %in% mapLayer){
+  sMap_border <- sMap_border +
+    geom_point(data = tmp_df, aes(x=Longitude, y=Latitude), color = "red", shape = 42)
+  }
+  if("ht_map" %in% mapLayer){
+    sMap_border <- sMap_border +
+      stat_density2d(data = tmp_df, aes(x=Longitude, y=Latitude, fill = ..level..)
+                     , alpha=0.5
+                     , geom ="polygon") +
+      scale_fill_gradientn(colours = rev(brewer.pal(3, "Spectral")))
 
-      sMap_border <- sMap_border +
-        geom_point(data = tmp_df, aes(x=Longitude, y=Latitude), color = "red", shape = 42)
+    # geom_density2d(aes(fill = ..level..), alpha=0.5, geom="polygon") +
+    # scale_fill_gradientn(colours=rev(brewer.pal(3,"Spectral"))) 
+  }
+  if("inc_rt" %in% mapLayer){
+    sMap_border <- sMap_border +
+      geom_polygon(data = census_info
+                   , aes(x=long, y = lat, group = group, fill = log1p(incidence_rt))
+                   , show.legend = TRUE
+                   , na.rm = TRUE) +
+      # coord_fixed(1.3) +
+      scale_fill_gradientn(colours=rev(brewer.pal(3, "RdYlBu"))) +
+      labs() +
+      scale_colour_manual(values = incidence_rt)
+    # popup <- paste0("GEOID: ", df.polygon@data$NAME
+    #                 , "<br>", "Incidence Rate of Counties: "
+    #                 , round(df.polygon@data$incidence_rt,3)
+    #                 , sep = " ")
+    # pal <- colorNumeric(palette = "YlGnBu"
+    #                     , domain = df.polygon@data$incidence_rt
+                        # , n = 7
+    # )
+    # sMap_border <- sMap_border %>%
+    #   # addProviderTiles("CartoDB.Positron") %>%
+    #   addPolygons(data = df.polygon, fillColor = ~pal(incidence_rt), color = "#b2aeae", fillOpacity = 0.7, weight = 0.3, smoothFactor = 0.2, popup = popup) %>%
+    #   addLegend(pal = pal, values = df.polygon$incidence_rt, position = "bottomleft", title = "Incidence Rate of Cases", labFormat = labelFormat(suffix = " cases per 100000"))
     }
-    if("ht_map" %in% mapLayer){
-      sMap_border <- sMap_border +
-        stat_density2d(data = tmp_df, aes(x=Longitude, y=Latitude, fill = ..level..)
-                              , alpha=0.5
-                              , geom ="polygon") +
-        scale_fill_gradientn(colours = rev(brewer.pal(3, "Spectral")))
-
-      # geom_density2d(aes(fill = ..level..), alpha=0.5, geom="polygon") +
-      # scale_fill_gradientn(colours=rev(brewer.pal(3,"Spectral"))) +
-    }
-    if ("inc_rt" %in% mapLayer){
-      sMap_border <- sMap_border +
-        geom_polygon(data = test_df, aes(x=long, y = lat, group = group, fill = log1p(incidence_rt)), na.rm = TRUE) +
-        coord_fixed(1.3) +
-        scale_fill_gradientn(colours=rev(brewer.pal(3, "RdYlBu")))
-      # popup <- paste0("GEOID: ", df.polygon@data$NAME
-      #                 , "<br>", "Incidence Rate of Counties: "
-      #                 , round(df.polygon@data$incidence_rt,3)
-      #                 , sep = " ")
-      # pal <- colorNumeric(palette = "YlGnBu"
-      #                     , domain = df.polygon@data$incidence_rt
-      #                     # , n = 7
-      # )
-      # zMap_border <- zMap_border %>%
-      #   # addProviderTiles("CartoDB.Positron") %>%
-      #   addPolygons(data = df.polygon, fillColor = ~pal(incidence_rt), color = "#b2aeae", fillOpacity = 0.7, weight = 0.3, smoothFactor = 0.2, popup = popup) %>%
-      #   addLegend(pal = pal, values = df.polygon$incidence_rt, position = "bottomleft", title = "Incidence Rate of Cases", labFormat = labelFormat(suffix = " cases per 100000"))
-    }
-    if("County" %in% mapBorder){
-      sMap_border <- sMap_border + geom_path(data = california, aes(x=long, y=lat, group = group), colour = "white")
-    }
+    # if("County" %in% mapBorder){
+    #   sMap_border <- sMap_border + geom_path(data = california, aes(x=long, y=lat, group = group), colour = "white")
+    # }
     # if("City" %in% mapBorder){
-    #   p <- p + geom_path(data = cities?, aes(x = long, y = lat, group = group), colour = "green")
+    #   sMap_border <- sMap_border + geom_path(data = cities?, aes(x = long, y = lat, group = group), colour = "green")
     # }
     #work on logic for switching out layers
 
