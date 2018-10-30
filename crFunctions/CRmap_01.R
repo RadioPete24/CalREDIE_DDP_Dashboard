@@ -1,13 +1,12 @@
 # CRmap01 <- function(mapBorder = NULL, mapLayer = NULL, tmp_df = tmp_df){
 CRmap01 <- function(mapLayer = "inc_rt", tmp_df, census_info){
   sMap_border <- ggplot() + geom_polygon(data = california, aes(x=long, y=lat, group = group)) +
-    geom_polygon(color = "black", fill = "gray") +
+    geom_polygon(color = "black", fill = "white") +
     coord_fixed(1.3) +
     xlim(-130, -107) + ylim(31.5,43) +
     labs(x = "Longitude"
          , y = "Latitude") +
-    # theme(plot.background = element_blank()) +
-    theme_nothing()
+    theme(plot.background = element_blank()) 
   
 # if(mapGroup == "pt_map"){
   if("pt_map" %in% mapLayer){
@@ -31,9 +30,9 @@ CRmap01 <- function(mapLayer = "inc_rt", tmp_df, census_info){
                    , show.legend = TRUE
                    , na.rm = TRUE) +
       # coord_fixed(1.3) +
-      scale_fill_gradientn(colours=rev(brewer.pal(3, "RdYlBu"))) +
-      labs() +
-      scale_colour_manual(values = incidence_rt)
+      scale_fill_gradientn(colours=rev(brewer.pal(3, "RdYlBu")))
+      # labs() +
+      # scale_colour_manual(values = incidence_rt)
     # popup <- paste0("GEOID: ", df.polygon@data$NAME
     #                 , "<br>", "Incidence Rate of Counties: "
     #                 , round(df.polygon@data$incidence_rt,3)

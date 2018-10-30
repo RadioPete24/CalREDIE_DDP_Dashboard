@@ -33,16 +33,6 @@
     #                    , selected = getDisNme
     # )
   })
-  # output$dataTable <- renderUI({
-  #   nm_df <- data_now()
-  #   nm_df
-  # })
-  #To create a selectize option for disNme...
-  # fluidRow(column(4,
-  #        hr(),
-  #        verbatimTextOutput('out4'),
-  #        selectInput('in4', 'Options', c(Choose='', state.name), selectize=TRUE)
-  # ))
   
   output$dateRange <- renderUI({
     tmp_df <- as.data.frame(data_now())
@@ -166,6 +156,17 @@
                        , choiceValues = getAgeGrp
                        , inline = TRUE)
   })
+  
+  # output$dataTable <- renderUI({
+  #   nm_df <- data_now()
+  #   nm_df
+  # })
+  #To create a selectize option for disNme...
+  # fluidRow(column(4,
+  #        hr(),
+  #        verbatimTextOutput('out4'),
+  #        selectInput('in4', 'Options', c(Choose='', state.name), selectize=TRUE)
+  # ))
   
   # output$values <- renderUI({paste("Hey is this?", input$rptGroup)
   #   })

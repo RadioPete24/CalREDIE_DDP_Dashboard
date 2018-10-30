@@ -33,7 +33,7 @@ CRmap00 <- function(mapBorder = "County", mapLayer = "inc_rt", tmp_df = tmp_df){
                     , "<br>", "Incidence Rate of Counties: "
                     , round(df.polygon@data$incidence_rt,3)
                     , sep = " ")
-    pal <- colorNumeric(palette = "YlGnBu"
+    pal <- colorNumeric(palette = "RdYlBu"
                         , domain = log1p(df.polygon@data$incidence_rt)
                         # , n = 7
     )
