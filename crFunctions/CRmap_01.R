@@ -30,7 +30,7 @@ CRmap01 <- function(mapLayer = "inc_rt", tmp_df, census_info){
                    , show.legend = TRUE
                    , na.rm = TRUE) +
       # coord_fixed(1.3) +
-      scale_fill_gradientn(colours=rev(brewer.pal(3, "RdYlBu")))
+      scale_fill_gradientn(colours=rev(brewer.pal(5, "RdYlBu")))
       # labs() +
       # scale_colour_manual(values = incidence_rt)
     # popup <- paste0("GEOID: ", df.polygon@data$NAME

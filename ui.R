@@ -140,10 +140,10 @@ tabPanel("Demographics",
          #                                                            , choices = c(""
          #                                                                          , "")
          #                                                            , selected = c("ALL"))),
-         conditionalPanel(condition = fC(c(1,2,3,4,5)), uiOutput("Sex")),
-         conditionalPanel(condition = fC(c(1,2,3,4,5)), uiOutput("ethnicity")),
-         conditionalPanel(condition = fC(c(1,2,3,4,5)), uiOutput("race"))
-         
+         conditionalPanel(condition = fC(c(1,2,3,4,5,6)), uiOutput("Sex")),
+         conditionalPanel(condition = fC(c(1,2,3,4,5,6)), uiOutput("ethnicity")),
+         conditionalPanel(condition = fC(c(1,2,3,4,5,6)), uiOutput("race")),
+         conditionalPanel(condition = fC(c(1,2,3,4,5,6)), uiOutput("ageGrp"))
          # conditionalPanel(condition = fC(c(1,2,3,4,5)), selectInput("gender"
          #                                                     , label = h5("Gender")
          #                                                     , choices = c("Total"
@@ -176,20 +176,24 @@ mainPanel(
   # tabPanel("table of tmp_df")
   
   tabsetPanel(type = "tabs",
-              tabPanel("Histogram"
-                       , plotOutput("distPlot", width = "100%", click = "plot1_click"), value = 1)
+              tabPanel("Histogram",      plotOutput("distPlot", width = "100%", click = "plot1_click")
+                         , value = 1)
               # , tabPanel("Map (Static)", plotOutput("CRstMapPlot", width = 700, height = 700)
               #                                       # , click = "plot1_click"
               #            , value = 2)
               , tabPanel("Map (Static)", plotOutput("CRstMapPlot")
                          # , click = "plot1_click"
                          , value = 2)
-              , tabPanel("Map (Zoom)", leafletOutput("CRzMapPlot", width = 700, height = 700)
+              , tabPanel("Map (Zoom)",   leafletOutput("CRzMapPlot", width = 700, height = 700)
                                                    # , click = "plot1_click"
                          , value = 3)
-              , tabPanel("Values", dataTableOutput("values"), value = "4") #DT:: #For output of input values chosen
+              , tabPanel("Values",       dataTableOutput("values")
+                         , value = 4) #DT:: #For output of input values chosen
               # , tabPanel("Population", dataTableOutput()) #DT:: #For output of population demographics
-              , tabPanel("County Cases", plotOutput("cntyPlot"), width = "100%", value = 5)
+              , tabPanel("County Cases", plotOutput("cntyPlot"), width = "100%"
+                         , value = 5)
+              , tabPanel("Population",   dataTableOutput("selectPop")
+                         , value = 6)
               , id = "ID" )
 
   )
@@ -199,3 +203,5 @@ mainPanel(
 #     tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
 )
 )
+# sidebarSearchForm(textId = "searchText", buttonId = "searchButton",
+#                   label = "Search...")

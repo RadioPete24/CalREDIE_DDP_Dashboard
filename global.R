@@ -31,10 +31,10 @@ source(file.path(myGIS_install, "gis_install_pkg.R"))
 # myFunction_list <- c("tsvFile.R", "CRmap_00.R", "dateRange.R")
 # sapply(file.path(paste0(myFunctions, myFunction_list)), FUN = function(x){ifelse (file.exists(x), source(x), warning("file does not exists"))}, .GlobalEnv)
 
-source(file.path(myFunctions, "tsvFile.R"))
-source(file.path(myFunctions, "CRmap_00.R"))# Zoom Map
-source(file.path(myFunctions, "CRmap_01.R"))# Static Map
-
+source(file.path(myFunctions, "tsvFile.R")) #for uploading data
+source(file.path(myFunctions, "CRmap_00.R")) # Zoom Map
+source(file.path(myFunctions, "CRmap_01.R")) # Static Map
+source(file.path(myFunctions, "summaryTbl.R")) #Table formatting
 #source(file.path(myFunctions, "dateRange.R"))
 
 # USE consistent map projection system throughout all app code !

@@ -42,6 +42,8 @@
                 , min = dateMin
                 , max = dateMax
                 , value = c(dateMin, dateMax)
+                , step = 12
+                , animate = TRUE
                 )
   })
 
@@ -127,6 +129,16 @@
     )
   })
   
+  output$ageGrp <- renderUI({
+    tmp_df <- as.data.frame(data_now())
+    getAgeGrp <- unique(unlist(tmp_df$ageGrp))
+    checkboxGroupInput(inputId = "ageGrp", label = h5("Age Group (years)")
+                       , choiceNames = getAgeGrp
+                       , choiceValues = getAgeGrp
+                       , inline = TRUE
+                       , selected = getAgeGrp)
+  })
+  
   # RV <- reactiveValues(b_ui_flg=FALSE)
   # 
   # output$A_panel <- renderUI({
@@ -147,16 +159,6 @@
   
 #Data Tables
   
-  output$ageGrp <- renderUI({
-    tmp_df <- as.data.frame(data_now())
-    
-    getAgeGrp <- unique(unlist(tmp_df$ageGrp))
-    checkboxGroupInput(inputId = "ageGrp", label = h5("Age Group")
-                       , choiceNames = getAgeGrp
-                       , choiceValues = getAgeGrp
-                       , inline = TRUE)
-  })
-  
   # output$dataTable <- renderUI({
   #   nm_df <- data_now()
   #   nm_df
@@ -174,7 +176,7 @@
     data.frame(
       Name = c("Disease", "Report Group"
                # , "bin"
-               , "dtRange", "Sex", "Ethnicity", "Race"),
+               , "dtRange", "Sex", "Ethnicity", "Race", "Age Group"),
       # Value = I(list(toString(c(input$disNme)
       #                        , toString(c(input$rptGroup))
       #                        # , input$binRange
@@ -189,7 +191,8 @@
                 , paste(input$dateRange, collapse = " to ")
                 , toString(input$Sex)
                 , toString(input$Ethnicity)
-                , toString(input$Race))
+                , toString(input$Race)
+                , toString(input$ageGrp))
       )
   })
 
@@ -203,7 +206,7 @@
                      & tmp_df$Sex %in% c(input$Sex)
                      & tmp_df$Race %in% c(input$Race)
                      & tmp_df$Ethnicity %in% c(input$Ethnicity)
-                     # & tmp_df$Quintile %in% ageGrp
+                     & tmp_df$ageGrp %in% c(input$ageGrp)
                      ,]
     # tmp_df <- tmp_df %>% filter(tmp_df$DisShort %in% input$disNme) %>% filter(tmp_df$RStatus %in% rptGroup)
    p <- ggplot(data = tmp_df, aes_string(x=tmp_df$DtEpisode
@@ -239,7 +242,7 @@
                      & tmp_df$Sex %in% c(input$Sex)
                      & tmp_df$Race %in% c(input$Race)
                      & tmp_df$Ethnicity %in% c(input$Ethnicity)
-                     # & tmp_df$Quintile %in% ageGrp
+                     & tmp_df$ageGrp %in% c(input$ageGrp)
                      ,]
     # if(4 %in% input$mapGroup){
     cnty_freq_df <- as.data.frame(table(tmp_df$LHJ, factor(tmp_df$RStatus)))
@@ -278,7 +281,7 @@
                      & tmp_df$Sex %in% c(input$Sex)
                      & tmp_df$Race %in% c(input$Race)
                      & tmp_df$Ethnicity %in% c(input$Ethnicity)
-                     # & tmp_df$Quintile %in% ageGrp
+                     & tmp_df$ageGrp %in% c(input$ageGrp)
                      ,]
     
     cnty_freq_df <- as.data.frame(table(tmp_df$LHJ, factor(tmp_df$RStatus)))
@@ -327,17 +330,17 @@
   
   # output$CRstMapPlot <- renderDataTable({
   output$CRstMapPlot <- renderPlot({
-    # tmp_df <- data_now()
-    # tmp_df$DtEpisode <- as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y")
-    # tmp_df <- tmp_df[(tmp_df$DtEpisode>=input$dateRange[1] & tmp_df$DtEpisode<=input$dateRange[2])
-    #                  & tmp_df$DisShort %in% c(input$disease)
-    #                  & tmp_df$RStatus %in% c(input$rstat)
-    #                  & tmp_df$Sex %in% c(input$Sex)
-    #                  & tmp_df$Race %in% c(input$Race)
-    #                  # & tmp_df$Ethnicity %in% c(input$Ethnicity)
-    #                  # & tmp_df$Quintile %in% ageGrp
-    #                  ,]
-      
+    tmp_df <- data_now()
+    tmp_df$DtEpisode <- as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y")
+    tmp_df <- tmp_df[(tmp_df$DtEpisode>=input$dateRange[1] & tmp_df$DtEpisode<=input$dateRange[2])
+                     & tmp_df$DisShort %in% c(input$disease)
+                     & tmp_df$RStatus %in% c(input$rstat)
+                     & tmp_df$Sex %in% c(input$Sex)
+                     & tmp_df$Race %in% c(input$Race)
+                     & tmp_df$Ethnicity %in% c(input$Ethnicity)
+                     & tmp_df$ageGrp %in% c(input$ageGrp)
+                     ,]
+    
       hist_df <- as.data.table(as.data.frame.matrix(table(tmp_df$LHJ, factor(tmp_df$RStatus))))
       hist_df <- cbind(as.data.table(table(tmp_df$LHJ))
                        , as.data.table(as.data.frame.matrix(table(tmp_df$LHJ, factor(tmp_df$RStatus)))))
@@ -384,10 +387,22 @@
     }
   )
   
-  output$guess <- renderTable({
-    rptGroup <- input$rstat
-    table(rptGroup)
-  })
+  output$selectPop <- renderDataTable({
+    tmp_df <- data_now()
+    tmp_df$DtEpisode <- as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y")
+    tmp_df <- tmp_df[(tmp_df$DtEpisode>=input$dateRange[1] & tmp_df$DtEpisode<=input$dateRange[2])
+                     & tmp_df$DisShort %in% c(input$disease)
+                     & tmp_df$RStatus %in% c(input$rstat)
+                     & tmp_df$Sex %in% c(input$Sex)
+                     & tmp_df$Race %in% c(input$Race)
+                     & tmp_df$Ethnicity %in% c(input$Ethnicity)
+                     & tmp_df$ageGrp %in% c(input$ageGrp)
+                     ,]
+    
+    demographic_lst <- list("Sex", "ageGrp", "Race", "Ethnicity", "RStatus")
+    demographicTbl <- getSummary(tmp_df = tmp_df, tbl_list = demographic_lst, crossTbl = NULL)
+     as.data.frame(demographicTbl)
+  }, escape = FALSE)
 
   # output$hover_info <- renderPrint({
   #   if(!is.null(input$plot_hover))
