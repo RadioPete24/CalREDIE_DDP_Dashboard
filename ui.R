@@ -98,8 +98,8 @@ sidebarLayout(
                                                         , selected = c("Incident Rate")
                                                         )),
     conditionalPanel(condition = fC(c(2)), downloadButton("downloadMap", "Download Map")),
-    conditionalPanel(condition = fC(c(1, 5)), downloadButton("downloadPlot", "Download Map")),
-    conditionalPanel(condition = fC(c(4)), downloadButton("downloadValues", "Download Values"))
+    conditionalPanel(condition = fC(c(1,5)), downloadButton("downloadPlot", "Download Map")),
+    conditionalPanel(condition = fC(c(4,7)), downloadButton("downloadValues", "Download Values"))
     # , conditionalPanel(condition = fC(c(2,3)), "input.tabs=='1'"
     #                  , downloadButton("downloadMap"
     #                                   , "Download Map")
@@ -140,16 +140,44 @@ tabPanel("Demographics",
          #                                                            , choices = c(""
          #                                                                          , "")
          #                                                            , selected = c("ALL"))),
-         conditionalPanel(condition = fC(c(1,2,3,4,5,6)), uiOutput("Sex")),
-         conditionalPanel(condition = fC(c(1,2,3,4,5,6)), uiOutput("ethnicity")),
-         conditionalPanel(condition = fC(c(1,2,3,4,5,6)), uiOutput("race")),
-         conditionalPanel(condition = fC(c(1,2,3,4,5,6)), uiOutput("ageGrp"))
+         conditionalPanel(condition = fC(c(1,2,3,4,5,6,7)), uiOutput("Sex")),
+         conditionalPanel(condition = fC(c(1,2,3,4,5,6,7)), uiOutput("ethnicity")),
+         conditionalPanel(condition = fC(c(1,2,3,4,5,6,7)), uiOutput("race")),
+         conditionalPanel(condition = fC(c(1,2,3,4,5,6,7)), uiOutput("ageGrp")),
+         conditionalPanel(condition = fC(c(1,2,3,4,5,6,7)), uiOutput("pregnant")),
+         conditionalPanel(condition = fC(c(1,2,3,4,5,6,7)), uiOutput("marital"))
          # conditionalPanel(condition = fC(c(1,2,3,4,5)), selectInput("gender"
          #                                                     , label = h5("Gender")
          #                                                     , choices = c("Total"
          #                                                                   , "Male"
          #                                                                   , "Female")
          #                                                     , selected = c("Total"))
+         ),
+
+tabPanel("Table Options",
+         conditionalPanel(condition = fC(c(6))
+                          # && ("input.crossTbl == 'TRUE'")
+                          , selectInput(inputId = "bivariate"
+                                        , label = h5("Select Table Bivariate")
+                                        # , inline = TRUE
+                                        , choices = c("Report Group" = "RStatus"
+                                                      , "Sex" = "Sex"
+                                                      , "Ethnicity" = "Ethnicity"
+                                                      , "Race" = "Race"
+                                                      , "Age Group" = "ageGrp"
+                                                      , "Marital Status" = "Marital"
+                                                      , "Pregnancy Status" = "Pregnant")
+                                        , selected = c("Report Group"
+                                                       , "Sex"
+                                                       , "Ethnicity"
+                                                       , "Race"
+                                                       , "Age Group"
+                                                       , "Marital Status"
+                                                       , "Pregnancy Status")
+         )),
+         conditionalPanel(condition = fC(c(6)), checkboxInput(inputId = "crossTbl"
+                                                              , label = h5("Bivariate Summary Table")
+                                                              , value = FALSE))
          )
 ),
 
@@ -176,7 +204,7 @@ mainPanel(
   # tabPanel("table of tmp_df")
   
   tabsetPanel(type = "tabs",
-              tabPanel("Histogram",      plotOutput("distPlot", width = "100%", click = "plot1_click")
+              tabPanel("Cases over Time",      plotOutput("distPlot", width = "100%", click = "plot1_click")
                          , value = 1)
               # , tabPanel("Map (Static)", plotOutput("CRstMapPlot", width = 700, height = 700)
               #                                       # , click = "plot1_click"
@@ -194,6 +222,8 @@ mainPanel(
                          , value = 5)
               , tabPanel("Population",   dataTableOutput("selectPop")
                          , value = 6)
+              , tabPanel("Data",   dataTableOutput("selectData")
+                                   , value = 7)
               , id = "ID" )
 
   )

@@ -131,7 +131,8 @@
   
   output$ageGrp <- renderUI({
     tmp_df <- as.data.frame(data_now())
-    getAgeGrp <- unique(unlist(tmp_df$ageGrp))
+    getAgeGrp <- unique(unlist(tmp_df$ageGrp))[sort.list(unique(unlist(tmp_df$ageGrp)))]
+    # getAgeGrp <- str_sort(unique(unlist(tmp_df$ageGrp)), numeric = TRUE) #requires stringr package
     checkboxGroupInput(inputId = "ageGrp", label = h5("Age Group (years)")
                        , choiceNames = getAgeGrp
                        , choiceValues = getAgeGrp
@@ -139,6 +140,27 @@
                        , selected = getAgeGrp)
   })
   
+  output$marital <- renderUI({
+    tmp_df <- as.data.frame(data_now())
+    getMarital <- unique(unlist(tmp_df$Marital))
+    selectInput(inputId = "marital"
+                , label = h5("Select Marital Status:")
+                , choices = getMarital
+                , selected = getMarital
+                , multiple = TRUE
+    )
+  })
+  
+  output$pregnant <- renderUI({
+    tmp_df <- as.data.frame(data_now())
+    getPreg <- unique(unlist(tmp_df$Pregnant))
+    selectInput(inputId = "pregnant"
+                , label = h5("Select Pregnancy Status:")
+                , choices = getPreg
+                , selected = getPreg
+                , multiple = TRUE
+    )
+  })
   # RV <- reactiveValues(b_ui_flg=FALSE)
   # 
   # output$A_panel <- renderUI({
@@ -174,9 +196,7 @@
   #   })
   output$values <- renderDataTable({
     data.frame(
-      Name = c("Disease", "Report Group"
-               # , "bin"
-               , "dtRange", "Sex", "Ethnicity", "Race", "Age Group"),
+      Name = c("Disease", "Report Group", "dtRange", "Sex", "Ethnicity", "Race", "Age Group", "Marital", "Pregnant"),
       # Value = I(list(toString(c(input$disNme)
       #                        , toString(c(input$rptGroup))
       #                        # , input$binRange
@@ -192,7 +212,9 @@
                 , toString(input$Sex)
                 , toString(input$Ethnicity)
                 , toString(input$Race)
-                , toString(input$ageGrp))
+                , toString(input$ageGrp)
+                , toString(input$marital)
+                , toString(input$pregnant))
       )
   })
 
@@ -207,6 +229,8 @@
                      & tmp_df$Race %in% c(input$Race)
                      & tmp_df$Ethnicity %in% c(input$Ethnicity)
                      & tmp_df$ageGrp %in% c(input$ageGrp)
+                     & tmp_df$Marital %in% c(input$marital)
+                     & tmp_df$Pregnant %in% c(input$pregnant)
                      ,]
     # tmp_df <- tmp_df %>% filter(tmp_df$DisShort %in% input$disNme) %>% filter(tmp_df$RStatus %in% rptGroup)
    p <- ggplot(data = tmp_df, aes_string(x=tmp_df$DtEpisode
@@ -243,7 +267,10 @@
                      & tmp_df$Race %in% c(input$Race)
                      & tmp_df$Ethnicity %in% c(input$Ethnicity)
                      & tmp_df$ageGrp %in% c(input$ageGrp)
+                     & tmp_df$Marital %in% c(input$marital)
+                     & tmp_df$Pregnant %in% c(input$pregnant)
                      ,]
+    
     # if(4 %in% input$mapGroup){
     cnty_freq_df <- as.data.frame(table(tmp_df$LHJ, factor(tmp_df$RStatus)))
     # hist2_df <- setDT(hist2_df)[, .(Total=sum(N)), by = .(V1,V2)]
@@ -282,6 +309,8 @@
                      & tmp_df$Race %in% c(input$Race)
                      & tmp_df$Ethnicity %in% c(input$Ethnicity)
                      & tmp_df$ageGrp %in% c(input$ageGrp)
+                     & tmp_df$Marital %in% c(input$marital)
+                     & tmp_df$Pregnant %in% c(input$pregnant)
                      ,]
     
     cnty_freq_df <- as.data.frame(table(tmp_df$LHJ, factor(tmp_df$RStatus)))
@@ -328,7 +357,6 @@
     # **This is where I will add custom function for plotting**
   })
   
-  # output$CRstMapPlot <- renderDataTable({
   output$CRstMapPlot <- renderPlot({
     tmp_df <- data_now()
     tmp_df$DtEpisode <- as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y")
@@ -339,6 +367,8 @@
                      & tmp_df$Race %in% c(input$Race)
                      & tmp_df$Ethnicity %in% c(input$Ethnicity)
                      & tmp_df$ageGrp %in% c(input$ageGrp)
+                     & tmp_df$Marital %in% c(input$marital)
+                     & tmp_df$Pregnant %in% c(input$pregnant)
                      ,]
     
       hist_df <- as.data.table(as.data.frame.matrix(table(tmp_df$LHJ, factor(tmp_df$RStatus))))
@@ -384,25 +414,23 @@
     # p2 <- CRmap01(mapBorder=input$mapBorder, mapLayer=input$mapLayer, tmp_df=tmp_df)
       p2 <- CRmap01(mapLayer = input$mapLayer, tmp_df=tmp_df, census_info = census_info)
       p2
-    }
-  )
+    })
   
   output$selectPop <- renderDataTable({
     tmp_df <- data_now()
-    tmp_df$DtEpisode <- as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y")
-    tmp_df <- tmp_df[(tmp_df$DtEpisode>=input$dateRange[1] & tmp_df$DtEpisode<=input$dateRange[2])
-                     & tmp_df$DisShort %in% c(input$disease)
-                     & tmp_df$RStatus %in% c(input$rstat)
-                     & tmp_df$Sex %in% c(input$Sex)
-                     & tmp_df$Race %in% c(input$Race)
-                     & tmp_df$Ethnicity %in% c(input$Ethnicity)
-                     & tmp_df$ageGrp %in% c(input$ageGrp)
-                     ,]
-    
-    demographic_lst <- list("Sex", "ageGrp", "Race", "Ethnicity", "RStatus")
-    demographicTbl <- getSummary(tmp_df = tmp_df, tbl_list = demographic_lst, crossTbl = NULL)
-     as.data.frame(demographicTbl)
+    # demographic_list <- list("Sex", "ageGrp", "Race", "Ethnicity", "RStatus")
+    # demographicTbl <- getSummaryTbl(tmp_df = tmp_df, tbl_list = demographic_lst, crossTbl = NULL)
+    demographicTbl <- getSummaryTbl(tmp_df = tmp_df, dtRange = input$dateRange, disShort = input$disease, Rstatus = input$rstat, sex = input$Sex, race = input$Race, ethnicity = input$Ethnicity, ageGrp = input$ageGrp, marital = input$marital, pregnant = input$pregnant
+                                    # , bivariate = input$bivariate, crossTbl = input$crossTbl
+                                    )
+    demographicTbl
   }, escape = FALSE)
+  
+  output$selectData <- renderDataTable({
+    tmp_df <- data_now()
+    tmp_df <- getDataTbl(tmp_df = tmp_df, dtRange = input$dateRange, disShort = input$disease, Rstatus = input$rstat, sex = input$Sex, race = input$Race, ethnicity = input$Ethnicity, ageGrp = input$ageGrp, marital = input$marital, pregnant = input$pregnant)
+    tmp_df
+  })
 
   # output$hover_info <- renderPrint({
   #   if(!is.null(input$plot_hover))

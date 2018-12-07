@@ -45,7 +45,8 @@ tsvFile <- function(input, output, session, stringsAsFactors = FALSE){
                             , Email
                             , OtherElectronicID
                             , WorkSchoolContact
-                            , Guardian)
+                            , Guardian
+                            , NOTES)
                             ) #Reading in .tsv file
     #Handle null mapping data
     tmp_df[is.null(tmp_df$Longitude),]<- NA
@@ -56,7 +57,11 @@ tsvFile <- function(input, output, session, stringsAsFactors = FALSE){
     # tmp_df$DtEpisode <- strptime(as.character(tmp_df$DtEpisode), format = '%m/%d/%Y')
     # tmp_df$DtEpisode <- as.Date(as.character(tmp_df$DtEpisode), format = '%m/%d/%y')
     # test$quintile <- ntile(tmp_df$Age, 5)
+    tmp_df[tmp_df$Marital == "",]$Marital <- "Unknown"
+    tmp_df[tmp_df$Pregnant == "" & tmp_df$Sex == "F",]$Pregnant <- "U"
+    tmp_df[tmp_df$Pregnant == "" & tmp_df$Sex == "M",]$Pregnant <- "NA"
     tmp_df$ageGrp <- cut(tmp_df$Age, breaks = quantile(tmp_df$Age, probs = seq(0,1,0.2)), include.lowest = TRUE)
+    tmp_df[tmp_df$Race == "",]$Race <- "Unknown"
     # test <- as.data.table(test)
     # test[, quintile := cut(tmp_df$Age, breaks = quantile(tmp_df$Age, probs = seq(0,1,0.2)), include.lowest = TRUE)]
     tmp_df$ageGrp <- gsub(pattern = ",", replacement = "-", x = tmp_df$ageGrp)

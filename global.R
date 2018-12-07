@@ -35,6 +35,7 @@ source(file.path(myFunctions, "tsvFile.R")) #for uploading data
 source(file.path(myFunctions, "CRmap_00.R")) # Zoom Map
 source(file.path(myFunctions, "CRmap_01.R")) # Static Map
 source(file.path(myFunctions, "summaryTbl.R")) #Table formatting
+source(file.path(myFunctions, "dataTbl.R"))
 #source(file.path(myFunctions, "dateRange.R"))
 
 # USE consistent map projection system throughout all app code !
