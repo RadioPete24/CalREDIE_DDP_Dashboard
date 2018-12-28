@@ -1,4 +1,4 @@
-getBivarSummaryTbl <- function(tmp_df = tmp_df, dtRange = input$dateRange, disShort = input$disease, Rstatus = input$rstat, sex = input$Sex, race = input$Race, ethnicity = input$Ethnicity, ageGrp = input$ageGrp, marital = input$marital, pregnant = input$pregnant
+getBivarSummaryTbl <- function(tmp_df = tmp_df, dtRange = input$dateRange, disShort = input$disease, Rstatus = input$rstat, sex = input$Sex, race = input$Race, ethnicity = input$Ethnicity, ageGrp = input$ageGrp, marital = input$marital, pregnant = input$pregnant, bivariate = input$bivariate
 ){
   tbl_list <- list("Sex", "ageGrp", "Race", "Ethnicity", "RStatus", "Marital", "Pregnant")
   tmp_df$DtEpisode <- as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y")
@@ -43,3 +43,9 @@ getBivarSummaryTbl <- function(tmp_df = tmp_df, dtRange = input$dateRange, disSh
       summary_tbl <- do.call(rbind, summary_tbl)
       as.data.frame(summary_tbl)
 }
+
+##may be losing because of cross talk with own variable...
+
+# View(as.data.frame.matrix(xtabs(~tmp_df[,as.character(tbl_list[2])] + tmp_df[,as.character(tbl_list[3])], data = tmp_df)))
+
+# tbl_list[-(which(tbl_list == c("Race")))]
