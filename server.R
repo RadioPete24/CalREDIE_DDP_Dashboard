@@ -46,6 +46,16 @@
                 , animate = TRUE
                 )
   })
+  
+# For generatinng data frame by disease week
+  # output$weekRange <- renderUI({
+  #   tmp_df <- as.data.frame (data_now())
+  #   # sprintf("%02d", as.numeric(strftime(seq.POSIXt(currentDate
+  #   #                                                , by = "-1 week"
+  #   #                                                , length.out = 4)[4]
+  #   #                                     , format = "%W")))
+  #   
+  # })
 
   output$binRange <- renderUI({
     tmp_df <- as.data.frame(data_now())
@@ -415,7 +425,7 @@
       p2 <- CRmap01(mapLayer = input$mapLayer, tmp_df=tmp_df, census_info = census_info)
       p2
     })
-  
+
   output$selectPop <- renderDataTable({
     tmp_df <- data_now()
     # demographic_list <- list("Sex", "ageGrp", "Race", "Ethnicity", "RStatus")
@@ -425,6 +435,27 @@
                                     )
     demographicTbl
   }, escape = FALSE)
+
+  ##Section for creating download feature of population demographic selection
+  datasetInput <- reactive({
+    tmp_df <- data_now()
+    # demographic_list <- list("Sex", "ageGrp", "Race", "Ethnicity", "RStatus")
+    # demographicTbl <- getSummaryTbl(tmp_df = tmp_df, tbl_list = demographic_lst, crossTbl = NULL)
+    demographicTbl <- getSummaryTbl(tmp_df = tmp_df, dtRange = input$dateRange, disShort = input$disease, Rstatus = input$rstat, sex = input$Sex, race = input$Race, ethnicity = input$Ethnicity, ageGrp = input$ageGrp, marital = input$marital, pregnant = input$pregnant
+                                    # , bivariate = input$bivariate, crossTbl = input$crossTbl
+    )
+    demographicTbl
+  }
+  )
+  
+  output$downloadPop <- downloadHandler(
+    filename = function(){
+      paste(input$selectPop, ".csv", sep = "")
+    }
+    content = functio(file){
+      write.csv(datasetInput(), file, row.names = TRUE)
+    }
+  )
   
   output$selectData <- renderDataTable({
     tmp_df <- data_now()

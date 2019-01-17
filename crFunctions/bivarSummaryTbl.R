@@ -13,10 +13,11 @@ getBivarSummaryTbl <- function(tmp_df = tmp_df, dtRange = input$dateRange, disSh
                    & tmp_df$Pregnant %in% c(pregnant)
                    ,]
   summary_tbl <- lst()
-  
+  tbl_list <- tbl_list[-(which(tbl_list == c(bivariate)))]
  
   for(i in 1:length(tbl_list)){
                #Data columns
+    # tbl_list[-(which(tbl_list == c("crossTbl")))]
                summary_tbl[[i]] <- data.frame(Var1 = row.names(cbind(as.data.frame.matrix(
                  xtabs(~tmp_df[,as.character(tbl_list[[i]])] + tmp_df[,as.character(bivariate)], data = tmp_df))
                  , as.data.frame.matrix(prop.table(xtabs(~tmp_df[,as.character(tbl_list[[i]])] + tmp_df[,as.character(bivariate)], data = tmp_df)))))

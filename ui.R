@@ -99,7 +99,9 @@ sidebarLayout(
                                                         )),
     conditionalPanel(condition = fC(c(2)), downloadButton("downloadMap", "Download Map")),
     conditionalPanel(condition = fC(c(1,5)), downloadButton("downloadPlot", "Download Map")),
-    conditionalPanel(condition = fC(c(4,7)), downloadButton("downloadValues", "Download Values"))
+    conditionalPanel(condition = fC(c(4,7)), downloadButton("selectData", "Download Data")),
+    conditionalPanel(condition = fC(c(4,7)), downloadButton("selectPop", "Download Demographics"))
+
     # , conditionalPanel(condition = fC(c(2,3)), "input.tabs=='1'"
     #                  , downloadButton("downloadMap"
     #                                   , "Download Map")
