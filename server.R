@@ -9,7 +9,7 @@
 
 # Define server logic required to draw a histogram
 # server <- 
-  shinyServer(function(input, output, session){
+shinyServer(function(input, output, session){
   #function to call instance of data
   data_now <- callModule(tsvFile, "datafile", stringsAsFactors = FALSE)
   # #Change max upload size of data file
@@ -36,6 +36,7 @@
   
   output$dateRange <- renderUI({
     tmp_df <- as.data.frame(data_now())
+    # Function is meant to read only the initial parameters and stay the same after selections so built without continuous rendering
     dateMin <- range(as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y"))[1]
     dateMax <- range(as.Date(tmp_df$DtEpisode, format = "%m/%d/%Y"))[2]
     sliderInput("dateRange", label = h5("Select Date Range:")
@@ -204,17 +205,10 @@
   
   # output$values <- renderUI({paste("Hey is this?", input$rptGroup)
   #   })
-  output$values <- renderDataTable({
+  #Function that creates table for selections
+  catSelect <- reactive(
     data.frame(
       Name = c("Disease", "Report Group", "dtRange", "Sex", "Ethnicity", "Race", "Age Group", "Marital", "Pregnant"),
-      # Value = I(list(toString(c(input$disNme)
-      #                        , toString(c(input$rptGroup))
-      #                        # , input$binRange
-      #                        , paste(input$dateRange, collapse = " to ")
-      #                        , toString(c(input$Sex))
-      #                        , toString(c(input$ethnicity))
-      #                        , toString(c(input$race))
-      #                      , stringAsFactors = FALSE)
       Value = c(toString(input$disease)
                 , toString(input$rstat)
                 # , input$binRange
@@ -225,8 +219,36 @@
                 , toString(input$ageGrp)
                 , toString(input$marital)
                 , toString(input$pregnant))
-      )
+    )
+  )
+
+  output$values <- renderDataTable({
+    catSelect()
   })
+  
+  # output$values <- renderDataTable({
+  #   data.frame(
+  #     Name = c("Disease", "Report Group", "dtRange", "Sex", "Ethnicity", "Race", "Age Group", "Marital", "Pregnant"),
+  #     # Value = I(list(toString(c(input$disNme)
+  #     #                        , toString(c(input$rptGroup))
+  #     #                        # , input$binRange
+  #     #                        , paste(input$dateRange, collapse = " to ")
+  #     #                        , toString(c(input$Sex))
+  #     #                        , toString(c(input$ethnicity))
+  #     #                        , toString(c(input$race))
+  #     #                      , stringAsFactors = FALSE)
+  #     Value = c(toString(input$disease)
+  #               , toString(input$rstat)
+  #               # , input$binRange
+  #               , paste(input$dateRange, collapse = " to ")
+  #               , toString(input$Sex)
+  #               , toString(input$Ethnicity)
+  #               , toString(input$Race)
+  #               , toString(input$ageGrp)
+  #               , toString(input$marital)
+  #               , toString(input$pregnant))
+  #     )
+  # })
 
 #Data Visualizations
   output$distPlot <- renderPlot({
@@ -294,8 +316,7 @@
            , x = "County"
            , y = "Count") 
     p
-    }
-    )
+    })
   
 
   #   test <- leaflet(data = subdat_county
@@ -436,7 +457,7 @@
     demographicTbl
   }, escape = FALSE)
 
-  ##Section for creating download feature of population demographic selection
+  #Section for creating download feature of population demographic selection
   datasetInput <- reactive({
     tmp_df <- data_now()
     # demographic_list <- list("Sex", "ageGrp", "Race", "Ethnicity", "RStatus")
@@ -448,20 +469,20 @@
   }
   )
   
-  output$downloadPop <- downloadHandler(
-    filename = function(){
-      paste(input$selectPop, ".csv", sep = "")
-    }
-    content = functio(file){
-      write.csv(datasetInput(), file, row.names = TRUE)
-    }
-  )
+  # output$downloadPop <- downloadHandler(
+  #   filename = function(){
+  #     paste(input$selectPop, ".csv", sep = "")
+  #   }
+  #   content = function(file){
+  #     write.csv(datasetInput(), file, row.names = TRUE)
+  #   }
+  # )
   
-  output$selectData <- renderDataTable({
-    tmp_df <- data_now()
-    tmp_df <- getDataTbl(tmp_df = tmp_df, dtRange = input$dateRange, disShort = input$disease, Rstatus = input$rstat, sex = input$Sex, race = input$Race, ethnicity = input$Ethnicity, ageGrp = input$ageGrp, marital = input$marital, pregnant = input$pregnant)
-    tmp_df
-  })
+ # output$selectData <- renderDataTable({
+ #    tmp_df <- data_now()
+ #    tmp_df <- getDataTbl(tmp_df = tmp_df, dtRange = input$dateRange, disShort = input$disease, Rstatus = input$rstat, sex = input$Sex, race = input$Race, ethnicity = input$Ethnicity, ageGrp = input$ageGrp, marital = input$marital, pregnant = input$pregnant)
+ #    tmp_df
+ #  })
 
   # output$hover_info <- renderPrint({
   #   if(!is.null(input$plot_hover))
@@ -592,23 +613,43 @@
   # #   
   # # })
   # 
-  output$downloadMap <- downloadHandler(
-    filename <- function(){paste(output$mapPlot, ".jpg", sep = '')},
-    content <- function(file){
-      png(file, width = 400, height = 300)
-      dev.off()
+  output$downloadPlot <- downloadHandler(
+    filename = function(){paste(input$distPlot, '.jpg', sep = '')},
+    content = function (file){
+      ggsave(file, plot = last_plot(), device = "jpeg", width = 8, height = 5.5, units = "in")
+      # ggsave(file, plot = last_plot(), device = "jpeg", width = 5, height = 4, units = "in", dpi = 700)
     }
   )
-
-  output$downloadValues <- downloadHandler(
-    filename <- function(){paste(output$values, ".csv")},
+  
+  output$downloadMapSt <- downloadHandler(
+    filename = function(){paste(input$CRstMapPlot, '.jpg', sep = '')},
     content = function(file){
-      write.csv(output$values, file)
+      ggsave(file, plot = last_plot(), device = "jpeg", width = 5, height = 5, units = "in")
     }
   )
   
+  # output$downloadMapZ <- downloadHandler(
+  #   filename <- function(){paste(input$mapPlot, ".jpg", sep = '')},
+  #   content <- function(file){
+  #     # ggsave(file, plot = plotInput(), device = device)
+  #     png(file, width = 400, height = 300)
+  #     dev.off()
+  #   }
+  # )
+# 
+  output$downloadValues <- downloadHandler(
+    filename <- function(){paste(input$values, ".csv")},
+    content = function(file){
+      write.csv(catSelect(), file, row.names = FALSE)
+    }
+  )
   
-  
+  output$downloadSummary <- downloadHandler(
+    filename <- function(){paste(input$summaryTbl, ".csv")},
+    content = function(file){
+      write.csv(summaryTbl(), file, row.names = FALSE)
+    }
+  )
   # tableOutput
   #   output$my_tooltip <- renderUI({
   #   hover <- input$plot_hover 

@@ -97,10 +97,13 @@ sidebarLayout(
                                                                              , "Point Map" = "pt_map")
                                                         , selected = c("Incident Rate")
                                                         )),
-    conditionalPanel(condition = fC(c(2)), downloadButton("downloadMap", "Download Map")),
-    conditionalPanel(condition = fC(c(1,5)), downloadButton("downloadPlot", "Download Map")),
-    conditionalPanel(condition = fC(c(4,7)), downloadButton("selectData", "Download Data")),
-    conditionalPanel(condition = fC(c(4,7)), downloadButton("selectPop", "Download Demographics"))
+    conditionalPanel(condition = fC(c(2)), downloadButton("downloadMapSt", "Download MapSt")),
+    # conditionalPanel(condition = fC(c(6)), downloadButton("downloadSummaryTbl", "Download Summary")),
+    conditionalPanel(condition = fC(c(4)), downloadButton("downloadValues", "Download Values")),
+    # conditionalPanel(condition = fC(c(4)), downloadButton("downloadValues", "Download Values")).
+    conditionalPanel(condition = fC(c(1,5)), downloadButton("downloadPlot", "Download Histogram"))
+    # conditionalPanel(condition = fC(c(4)), downloadButton("selectData", "Download Data"))
+    # conditionalPanel(condition = fC(c(7)), downloadButton("selectPop", "Download Demographics"))
 
     # , conditionalPanel(condition = fC(c(2,3)), "input.tabs=='1'"
     #                  , downloadButton("downloadMap"
@@ -187,7 +190,7 @@ helpText(n1)
 , br()
 , helpText(n2, style="color:red")
 , br()
-, HTML('<center><img src="CalREDIE_logo.jpg" height="70" width="250"></center>')
+, HTML('<center><img src="CalREDIE_logo.jpg" height="65" width="275"></center>')
 , helpText("LINKS",tags$a(href="https://www.cdph.ca.gov/Programs/DDP/Pages/Data-and-Statistics-.aspx",
                         h6("CalREDIE Reporting Application")),
          tags$a(href="https://cdph.ca.gov/",
@@ -206,25 +209,22 @@ mainPanel(
   # tabPanel("table of tmp_df")
   
   tabsetPanel(type = "tabs",
-              tabPanel("Cases over Time",      plotOutput("distPlot", width = "100%", click = "plot1_click")
+              tabPanel("Cases over Time", plotOutput("distPlot", width = "100%", click = "plot1_click")
                          , value = 1)
-              # , tabPanel("Map (Static)", plotOutput("CRstMapPlot", width = 700, height = 700)
-              #                                       # , click = "plot1_click"
-              #            , value = 2)
-              , tabPanel("Map (Static)", plotOutput("CRstMapPlot")
+              , tabPanel("Map (Static)",  plotOutput("CRstMapPlot")
                          # , click = "plot1_click"
                          , value = 2)
-              , tabPanel("Map (Zoom)",   leafletOutput("CRzMapPlot", width = 700, height = 700)
+              , tabPanel("Map (Zoom)",    leafletOutput("CRzMapPlot", width = 700, height = 700)
                                                    # , click = "plot1_click"
                          , value = 3)
-              , tabPanel("Values",       dataTableOutput("values")
+              , tabPanel("Values",        dataTableOutput("values")
                          , value = 4) #DT:: #For output of input values chosen
               # , tabPanel("Population", dataTableOutput()) #DT:: #For output of population demographics
-              , tabPanel("County Cases", plotOutput("cntyPlot"), width = "100%"
+              , tabPanel("County Cases",  plotOutput("cntyPlot"), width = "100%"
                          , value = 5)
-              , tabPanel("Population",   dataTableOutput("selectPop")
+              , tabPanel("Population",    dataTableOutput("selectPop")
                          , value = 6)
-              , tabPanel("Data",   dataTableOutput("selectData")
+              , tabPanel("Data",          dataTableOutput("selectData")
                                    , value = 7)
               , id = "ID" )
 
