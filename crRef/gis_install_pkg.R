@@ -42,3 +42,11 @@ lapply(pkg_list, require, character.only = TRUE)
 #Obtaining the shapefiles to be used in the CRmap
 
 # require(leafletR)
+# plotInput <- function(file){
+#   cairo_pdf(filename = file,
+#             width = 18, height = 10, pointsize = 12, family = "sans", bg = "transparent",
+#             antialias = "subpixel",fallback_resolution = 300)
+#   vegan::ordiplot(nms_graph) #Note that this is not the exact code (just for simplicity here)
+#   dev.off()
+#   dev.copy2pdf(file)
+# }
