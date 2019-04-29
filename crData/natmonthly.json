@@ -1,0 +1,69 @@
+{
+  "@context": "https://project-open-data.cio.gov/v1.1/schema/catalog.jsonld",
+  "@id": "https://api.census.gov/data/2017/pep/natmonthly.json",
+  "@type": "dcat:Catalog",
+  "conformsTo": "https://project-open-data.cio.gov/v1.1/schema",
+  "describedBy": "https://project-open-data.cio.gov/v1.1/schema/catalog.json",
+  "dataset": [
+    {
+      "c_vintage": 2017,
+      "c_dataset": [
+        "pep",
+        "natmonthly"
+      ],
+      "c_geographyLink": "https://api.census.gov/data/2017/pep/natmonthly/geography.json",
+      "c_variablesLink": "https://api.census.gov/data/2017/pep/natmonthly/variables.json",
+      "c_examplesLink": "https://api.census.gov/data/2017/pep/natmonthly/examples.json",
+      "c_groupsLink": "https://api.census.gov/data/2017/pep/natmonthly/groups.json",
+      "c_valuesLink": "https://api.census.gov/data/2017/pep/natmonthly/values.json",
+      "c_documentationLink": "http://www.census.gov/developer/",
+      "c_isAggregate": true,
+      "c_isCube": true,
+      "c_isAvailable": true,
+      "@type": "dcat:Dataset",
+      "title": "Vintage 2017 Population Estimates: National Monthly Population Estimates",
+      "accessLevel": "public",
+      "bureauCode": [
+        "006:07"
+      ],
+      "description": "Monthly Population Estimates by Universe, Age, Sex, Race, and Hispanic Origin for the United States: April 1, 2010 to December 1, 2017 // Source: U.S. Census Bureau, Population Division // The contents of this file are released on a rolling basis from December through June. // Note: 'In combination' means in combination with one or more other races. The sum of the five race-in-combination groups adds to more than the total population because individuals may report more than one race. Hispanic origin is considered an ethnicity, not a race. Hispanics may be of any race. Responses of 'Some Other Race' from the 2010 Census are modified. This results in differences between the population for specific race categories shown for the 2010 Census population in this file versus those in the original 2010 Census data. For more information, see https://www2.census.gov/programs-surveys/popest/technical-documentation/methodology/modified-race-summary-file-method/mrsf2010.pdf. // The estimates are based on the 2010 Census and reflect changes to the April 1, 2010 population due to the Count Question Resolution program and geographic program revisions. // Persons on active duty in the Armed Forces were not enumerated in the 2010 Census. Therefore, variables for the 2010 Census civilian, civilian noninstitutionalized, and resident population plus Armed Forces overseas populations cannot be derived and are not available on these files. // For detailed information about the methods used to create the population estimates, see https://www.census.gov/programs-surveys/popest/technical-documentation/methodology.html. // Each year, the Census Bureau's Population Estimates Program (PEP) utilizes current data on births, deaths, and migration to calculate population change since the most recent decennial census, and produces a time series of estimates of population. The annual time series of estimates begins with the most recent decennial census data and extends to the vintage year. The vintage year (e.g., V2017) refers to the final year of the time series. The reference date for all estimates is July 1, unless otherwise specified. With each new issue of estimates, the Census Bureau revises estimates for years back to the last census. As each vintage of estimates includes all years since the most recent decennial census, the latest vintage of data available supersedes all previously produced estimates for those dates. The Population Estimates Program provides additional information including historical and intercensal estimates, evaluation estimates, demographic analysis, and research papers on its website: https://www.census.gov/programs-surveys/popest.html.",
+      "distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "accessURL": "https://api.census.gov/data/2017/pep/natmonthly",
+          "description": "API endpoint",
+          "format": "API",
+          "mediaType": "application/json",
+          "title": "API endpoint"
+        }
+      ],
+      "contactPoint": {
+        "fn": "Population Estimates Branch",
+        "hasEmail": "pop.population.estimates@census.gov"
+      },
+      "identifier": "http://api.census.gov/data/id/POPESTnatmonthly2017",
+      "license": "http://creativecommons.org/publicdomain/zero/1.0/Public Domain",
+      "modified": "2018-06-21",
+      "programCode": [
+        "006:008"
+      ],
+      "references": [
+        "http://www.census.gov/developers/"
+      ],
+      "spatial": "United States",
+      "temporal": "April 1,2010",
+      "publisher": {
+        "@type": "org:Organization",
+        "name": "U.S. Census Bureau",
+        "subOrganizationOf": {
+             "@type": "org:Organization",
+             "name": "U.S. Department Of Commerce",
+             "subOrganizationOf": {
+                 "@type": "org:Organization",
+                 "name": "U.S. Government"
+             }
+         }
+      }
+    }
+  ]
+}
